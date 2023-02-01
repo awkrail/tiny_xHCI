@@ -62,6 +62,7 @@ void KernelMain(const struct FrameBufferConfig *frame_buffer_config)
 {
   const struct PixelColor black = {0, 0, 0};
   const struct PixelColor gray = {128, 128, 128};
+  const struct PixelColor white = {255, 255, 255};
   
   const struct IntVector2D ul_p = {0, 0};
   const struct IntVector2D lr_p = {frame_buffer_config->horizontal_resolution, 
@@ -99,7 +100,8 @@ void KernelMain(const struct FrameBufferConfig *frame_buffer_config)
   err = ReadBar(xhc_dev, &xhc_bar, 0);
   Log(kDebug, &console, "ReadBar: %s\n", GetErrName(err));
   Log(kDebug, &console, "xhc_bar: %08lx\n", xhc_bar);
-  const uint64_t xhc_mmio_base = xhc_bar & ~(uint64_t)(0xf);
+  //const uint64_t xhc_mmio_base = xhc_bar & 0xfffffff0u;
+  const uint64_t xhc_mmio_base = xhc_bar;
   Log(kDebug, &console, "xHC mmio_base = %08lx\n", xhc_mmio_base);
 
   // Initialize xHCI
