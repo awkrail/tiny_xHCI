@@ -3,6 +3,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "registers.h"
+
 struct Controller
 {
   uintptr_t mmio_base;
@@ -14,26 +16,26 @@ struct Controller
 struct CapabilityRegisters
 {
   uint32_t CAPLENGTH_HCIVERSION;
-  uint32_t HCSPARAMS1;
-  uint32_t HCSPARAMS2;
-  uint32_t HCSPARAMS3;
-  uint32_t HCCPARAMS1;
-  uint32_t DBOFF;
-  uint32_t RTSOFF;
-  uint32_t HCCPARAMS2;
+  union HCSPARAMS1_Bitmap HCSPARAMS1;
+  union HCSPARAMS2_Bitmap HCSPARAMS2;
+  union HCSPARAMS3_Bitmap HCSPARAMS3;
+  union HCCPARAMS1_Bitmap HCCPARAMS1;
+  union DBOFF_Bitmap DBOFF;
+  union RTSOFF_Bitmap RTSOFF;
+  union HCCPARAMS2_Bitmap HCCPARAMS2;
 } __attribute__((packed));
 
 struct OperationalRegisters
 {
-  uint32_t USBCMD;
-  uint32_t USBSTS;
+  union USBCMD_Bitmap USBCMD;
+  union USBSTS_Bitmap USBSTS;
   uint32_t PAGESIZE;
   uint32_t reserved1[2];
   uint32_t DNCTRL;
-  uint64_t CRCR;
+  union CRCR_Bitmap CRCR;
   uint32_t reserved2[4];
-  uint64_t DCBAAP;
-  uint32_t CONFIG;
+  union DCBAAP_Bitmap DCBAAP;
+  union CONFIG_Bitmap CONFIG;
 } __attribute__((packed));
 
 void InitializeController(struct Controller *xhc,
