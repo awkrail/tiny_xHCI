@@ -10,6 +10,9 @@
 #include "error.h"
 #include "logger.h"
 
+// xHCI host driver
+#include "usb/xhci/xhci.h"
+
 struct Console console;
 
 int printk(const char *format, ...)
@@ -100,11 +103,34 @@ void KernelMain(const struct FrameBufferConfig *frame_buffer_config)
   err = ReadBar(xhc_dev, &xhc_bar, 0);
   Log(kDebug, &console, "ReadBar: %s\n", GetErrName(err));
   Log(kDebug, &console, "xhc_bar: %08lx\n", xhc_bar);
-  //const uint64_t xhc_mmio_base = xhc_bar & 0xfffffff0u;
-  const uint64_t xhc_mmio_base = xhc_bar;
-  Log(kDebug, &console, "xHC mmio_base = %08lx\n", xhc_mmio_base);
+  const uint64_t xhc_mmio_base = xhc_bar & ~(uint64_t)0xf;
+  Log(kDebug, &console, "xhc_mmio_base: %08lx\n", xhc_mmio_base);
 
   // Initialize xHCI
-  // SwitchEhci2Xhci(xhc_dev);
+  // 1. Initialize controller
+  // 1.1 Load Capability / Operational Registers
+  struct Controller xhc;
+  InitializeController(&xhc, xhc_mmio_base);
+  struct CapabilityRegisters *cap = xhc.cap;
+  struct OperationalRegisters *op = xhc.op;
+
+  printk("mmio+cap_length: %08lx\n", xhc_mmio_base + ReadCAPLENGTH(xhc.cap));
+
+  printk("CAPLENGTH=%02x\n"
+         "HCIVERSION=%04x\n"
+         "DBOFF=%08x\n"
+         "RTSOFF=%08x\n"
+         "HCSPARAMS1=%08x\n"
+         "HCCPARAMS1=%08x\n",
+         ReadCAPLENGTH(cap), ReadHCIVERSION(cap),
+         cap->DBOFF, cap->RTSOFF, cap->HCSPARAMS1,
+         cap->HCCPARAMS1);
+
+  printk("USBCMD=%08x\n"
+         "USBSTS=%08x\n"
+         "DCBAAP=%08x\n"
+         "CONFIG=%08x\n",
+         op->USBCMD, op->USBSTS, op->DCBAAP, op->CONFIG);
+
   while (1) __asm__("hlt");
 }
