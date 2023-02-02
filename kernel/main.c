@@ -132,5 +132,8 @@ void KernelMain(const struct FrameBufferConfig *frame_buffer_config)
          "CONFIG=%08x\n",
          op->USBCMD, op->USBSTS, op->DCBAAP, op->CONFIG);
 
+  printk("MaxSlots: %u\n", cap->HCSPARAMS1.bits.max_device_slots);
+  printk("MaxSlots Enabled: %u\n", op->CONFIG.bits.max_device_slots_enabled);
+
   while (1) __asm__("hlt");
 }

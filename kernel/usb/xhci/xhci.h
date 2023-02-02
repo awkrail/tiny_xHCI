@@ -5,6 +5,8 @@
 
 #include "registers.h"
 
+#define kDeviceSize 8
+
 struct Controller
 {
   uintptr_t mmio_base;
@@ -41,6 +43,8 @@ struct OperationalRegisters
 void InitializeController(struct Controller *xhc,
                           uintptr_t mmio_base);
 void SetCapAndOpRegisters(struct Controller *xhc);
+void ResetController(struct Controller *xhc);
+void SetMaxSlotEnabled(struct Controller* xhc);
 
 // Register-related functions
 uint8_t ReadCAPLENGTH(const struct CapabilityRegisters *cap);
