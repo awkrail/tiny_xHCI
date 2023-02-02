@@ -10,7 +10,6 @@ struct Controller
   uintptr_t mmio_base;
   struct CapabilityRegisters *cap;
   struct OperationalRegisters *op;
-  //uint8_t max_ports;
 };
 
 struct CapabilityRegisters
@@ -38,8 +37,11 @@ struct OperationalRegisters
   union CONFIG_Bitmap CONFIG;
 } __attribute__((packed));
 
+// Controller-related functions
 void InitializeController(struct Controller *xhc,
                           uintptr_t mmio_base);
+void SetCapAndOpRegisters(struct Controller *xhc);
 
+// Register-related functions
 uint8_t ReadCAPLENGTH(const struct CapabilityRegisters *cap);
 uint16_t ReadHCIVERSION(const struct CapabilityRegisters *cap);
