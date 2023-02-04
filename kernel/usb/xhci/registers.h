@@ -161,6 +161,6 @@ union CONFIG_Bitmap {
     uint32_t max_device_slots_enabled : 8;
     uint32_t u3_entry_enable : 1;
     uint32_t configuration_information_enable : 1;
-    uint32_t : 22;
+    uint32_t reserved: 22;
   } __attribute__((packed)) bits;
 } __attribute__((packed));

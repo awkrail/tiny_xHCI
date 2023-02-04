@@ -2,7 +2,8 @@
 #include "xhci.h"
 
 void InitializeController(struct Controller *xhc,
-                          uintptr_t mmio_base)
+                          uintptr_t mmio_base,
+                          struct Console *console)
 {
   // set registers
   xhc->mmio_base = mmio_base;
@@ -10,10 +11,12 @@ void InitializeController(struct Controller *xhc,
 
   // reset controller
   // RequestHCOwnership();
-  ResetController(xhc);
+  //ResetController(xhc);
 
   // set Max Slots Enabled
-  SetMaxSlotEnabled(xhc);
+  xhc->op->CONFIG.bits.max_device_slots_enabled = 100;
+  Log(kDebug, console, "hogehogehoge");
+  SetMaxSlotEnabled(xhc, console);
 }
 
 void SetCapAndOpRegisters(struct Controller *xhc)
@@ -40,11 +43,14 @@ void ResetController(struct Controller *xhc)
   while(xhc->op->USBSTS.bits.controller_not_ready);
 }
 
-void SetMaxSlotEnabled(struct Controller* xhc)
+void SetMaxSlotEnabled(struct Controller *xhc,
+                       struct Console *console)
 {
-  union CONFIG_Bitmap* config = &xhc->op->CONFIG;
-  //(&config->bits)->max_device_slots_enabled = 8;
-  // TODO: Change bit field through function..
+  //xhc->op->CONFIG.bits.max_device_slots_enabled = 100;
+  Log(kDebug, console, "config (max_device_slots): %d\n", xhc->op->CONFIG.bits.max_device_slots_enabled);
+  //Log(kDebug, console, "config (u3_entry_enable): %lx\n", xhc->op->CONFIG.bits.u3_entry_enable);
+  //Log(kDebug, console, "config (config_info): %lx\n", xhc->op->CONFIG.bits.configuration_information_enable);
+  //Log(kDebug, console, "config (reserved): %lx\n", xhc->op->CONFIG.bits.reserved);
 }
 
 uint8_t ReadCAPLENGTH(const struct CapabilityRegisters *cap)

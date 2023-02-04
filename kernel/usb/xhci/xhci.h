@@ -3,6 +3,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "../../logger.h"
 #include "registers.h"
 
 #define kDeviceSize 8
@@ -41,10 +42,12 @@ struct OperationalRegisters
 
 // Controller-related functions
 void InitializeController(struct Controller *xhc,
-                          uintptr_t mmio_base);
+                          uintptr_t mmio_base,
+                          struct Console *console);
 void SetCapAndOpRegisters(struct Controller *xhc);
 void ResetController(struct Controller *xhc);
-void SetMaxSlotEnabled(struct Controller* xhc);
+void SetMaxSlotEnabled(struct Controller* xhc,
+                       struct Console *console);
 
 // Register-related functions
 uint8_t ReadCAPLENGTH(const struct CapabilityRegisters *cap);

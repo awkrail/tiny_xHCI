@@ -110,11 +110,9 @@ void KernelMain(const struct FrameBufferConfig *frame_buffer_config)
   // 1. Initialize controller
   // 1.1 Load Capability / Operational Registers
   struct Controller xhc;
-  InitializeController(&xhc, xhc_mmio_base);
+  InitializeController(&xhc, xhc_mmio_base, &console);
   struct CapabilityRegisters *cap = xhc.cap;
   struct OperationalRegisters *op = xhc.op;
-
-  printk("mmio+cap_length: %08lx\n", xhc_mmio_base + ReadCAPLENGTH(xhc.cap));
 
   printk("CAPLENGTH=%02x\n"
          "HCIVERSION=%04x\n"
@@ -132,8 +130,14 @@ void KernelMain(const struct FrameBufferConfig *frame_buffer_config)
          "CONFIG=%08x\n",
          op->USBCMD, op->USBSTS, op->DCBAAP, op->CONFIG);
 
-  printk("MaxSlots: %u\n", cap->HCSPARAMS1.bits.max_device_slots);
-  printk("MaxSlots Enabled: %u\n", op->CONFIG.bits.max_device_slots_enabled);
+  //uint32_t val = op->CONFIG.data;
+  //op->CONFIG.data = val;
+
+  printk("max_device_slots: %lx\n", op->CONFIG.bits.max_device_slots_enabled);
+  printk("u3_entry: %lx\n", op->CONFIG.bits.u3_entry_enable);
+  printk("configuration_info: %lx\n", op->CONFIG.bits.configuration_information_enable);
+  printk("Rsv: %lx\n", op->CONFIG.bits.reserved);
+  printk("CONFIG: %lx\n", op->CONFIG.data);
 
   while (1) __asm__("hlt");
 }
