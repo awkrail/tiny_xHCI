@@ -10,13 +10,42 @@ void InitializeController(struct Controller *xhc,
   xhc->mmio_base = mmio_base;
   SetCapAndOpRegisters(xhc);
 
+  // for debug
+  PrintAllRegisters(xhc, console);
+
   // reset controller
   // RequestHCOwnership();
   //ResetController(xhc);
 
   // set Max Slots Enabled
-  xhc->op->CONFIG.bits.max_device_slots_enabled = 100;
   SetMaxSlotEnabled(xhc, console);
+  PrintAllRegisters(xhc, console);
+}
+
+// for debug
+void PrintAllRegisters(struct Controller *xhc,
+                       struct Console *console)
+{
+  Log(kDebug,
+      console,
+      "CAPLENGTH=%02x\n"
+      "HCIVERSION=%04x\n"
+      "DBOFF=%08x\n"
+      "RTSOFF=%08x\n"
+      "HCSPARAMS1=%08x\n"
+      "HCCPARAMS1=%08x\n",
+      ReadCAPLENGTH(cap), ReadHCIVERSION(cap),
+      cap->DBOFF, cap->RTSOFF, cap->HCSPARAMS1,
+      cap->HCCPARAMS1);
+
+  Log(kDebug,
+      console,
+      "USBCMD=%08x\n"
+      "USBSTS=%08x\n"
+      "DCBAAP=%08x\n"
+      "CONFIG=%08x\n"
+      op->USBCMD, op->USBSTS,
+      op->DCBAAP, op->CONFIG);
 }
 
 void SetCapAndOpRegisters(struct Controller *xhc)

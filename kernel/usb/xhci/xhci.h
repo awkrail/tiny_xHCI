@@ -44,6 +44,8 @@ struct OperationalRegisters
 void InitializeController(struct Controller *xhc,
                           uintptr_t mmio_base,
                           struct Console *console);
+void PrintAllRegisters(struct Controller *xhc,
+                       struct Console *console);
 void SetCapAndOpRegisters(struct Controller *xhc);
 void ResetController(struct Controller *xhc);
 void SetMaxSlotEnabled(struct Controller* xhc,

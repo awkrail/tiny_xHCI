@@ -111,32 +111,5 @@ void KernelMain(const struct FrameBufferConfig *frame_buffer_config)
   // 1.1 Load Capability / Operational Registers
   struct Controller xhc;
   InitializeController(&xhc, xhc_mmio_base, &console);
-  struct CapabilityRegisters *cap = xhc.cap;
-  struct OperationalRegisters *op = xhc.op;
-
-  printk("CAPLENGTH=%02x\n"
-         "HCIVERSION=%04x\n"
-         "DBOFF=%08x\n"
-         "RTSOFF=%08x\n"
-         "HCSPARAMS1=%08x\n"
-         "HCCPARAMS1=%08x\n",
-         ReadCAPLENGTH(cap), ReadHCIVERSION(cap),
-         cap->DBOFF, cap->RTSOFF, cap->HCSPARAMS1,
-         cap->HCCPARAMS1);
-
-  printk("USBCMD=%08x\n"
-         "USBSTS=%08x\n"
-         "DCBAAP=%08x\n"
-         "CONFIG=%08x\n",
-         op->USBCMD, op->USBSTS, op->DCBAAP, op->CONFIG);
-
-  //uint32_t val = op->CONFIG.data;
-  //op->CONFIG.data = val;
-
-  printk("max_device_slots: %lx\n", op->CONFIG.bits.max_device_slots_enabled);
-  printk("u3_entry: %lx\n", op->CONFIG.bits.u3_entry_enable);
-  printk("configuration_info: %lx\n", op->CONFIG.bits.configuration_information_enable);
-  printk("CONFIG: %lx\n", op->CONFIG.data);
-
   while (1) __asm__("hlt");
 }
