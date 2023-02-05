@@ -8,13 +8,13 @@ void InitializeController(struct Controller *xhc,
 {
   // set registers
   xhc->mmio_base = mmio_base;
-  SetCapAndOpRegisters(xhc);
+  SetCapAndOpRegisters(xhc, console);
 
   // for debug
   PrintAllRegisters(xhc, console);
 
   // reset controller
-  // RequestHCOwnership();
+  //RequestHCOwnership();
   //ResetController(xhc);
 
   // set Max Slots Enabled
@@ -26,6 +26,19 @@ void InitializeController(struct Controller *xhc,
 void PrintAllRegisters(struct Controller *xhc,
                        struct Console *console)
 {
+  volatile struct CapabilityRegisters *cap = xhc->cap;
+  volatile struct OperationalRegisters *op = xhc->op;
+
+  Log(kDebug,
+      console,
+      "len(CapabilityRegisters)=%u\n",
+      sizeof(struct CapabilityRegisters));
+
+  Log(kDebug,
+      console,
+      "len(OperationalRegisters)=%u\n",
+      sizeof(struct OperationalRegisters));
+
   Log(kDebug,
       console,
       "CAPLENGTH=%02x\n"
@@ -43,18 +56,17 @@ void PrintAllRegisters(struct Controller *xhc,
       "USBCMD=%08x\n"
       "USBSTS=%08x\n"
       "DCBAAP=%08x\n"
-      "CONFIG=%08x\n"
+      "CONFIG=%08x\n",
       op->USBCMD, op->USBSTS,
-      op->DCBAAP, op->CONFIG);
+      op->DCBAAP, op->CONFIG.data);
 }
 
-void SetCapAndOpRegisters(struct Controller *xhc)
+void SetCapAndOpRegisters(struct Controller *xhc,
+                          struct Console *console)
 {
   uintptr_t mmio_base = xhc->mmio_base;
-  memcpy(xhc->cap, (void*)mmio_base, 
-         sizeof(struct CapabilityRegisters));
-  memcpy(xhc->op,(void*)(mmio_base+ReadCAPLENGTH(xhc->cap)), 
-         sizeof(struct OperationalRegisters));
+  xhc->cap = (struct CapabilityRegisters*)mmio_base;
+  xhc->op = (struct OperationalRegisters*)(mmio_base + ReadCAPLENGTH(xhc->cap));
 }
 
 void ResetController(struct Controller *xhc)
@@ -80,12 +92,12 @@ void SetMaxSlotEnabled(struct Controller *xhc,
   xhc->op->CONFIG.bits.max_device_slots_enabled = kDeviceSize;
 }
 
-uint8_t ReadCAPLENGTH(const struct CapabilityRegisters *cap)
+uint8_t ReadCAPLENGTH(volatile struct CapabilityRegisters *cap)
 {
   return cap->CAPLENGTH_HCIVERSION & 0xffu;
 }
 
-uint16_t ReadHCIVERSION(const struct CapabilityRegisters *cap)
+uint16_t ReadHCIVERSION(volatile struct CapabilityRegisters *cap)
 {
   return cap->CAPLENGTH_HCIVERSION >> 16;
 }

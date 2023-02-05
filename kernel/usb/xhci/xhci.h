@@ -11,8 +11,8 @@
 struct Controller
 {
   uintptr_t mmio_base;
-  struct CapabilityRegisters *cap;
-  struct OperationalRegisters *op;
+  volatile struct CapabilityRegisters *cap;
+  volatile struct OperationalRegisters *op;
 };
 
 struct CapabilityRegisters
@@ -46,11 +46,12 @@ void InitializeController(struct Controller *xhc,
                           struct Console *console);
 void PrintAllRegisters(struct Controller *xhc,
                        struct Console *console);
-void SetCapAndOpRegisters(struct Controller *xhc);
+void SetCapAndOpRegisters(struct Controller *xhc,
+                          struct Console *console);
 void ResetController(struct Controller *xhc);
 void SetMaxSlotEnabled(struct Controller* xhc,
                        struct Console *console);
 
 // Register-related functions
-uint8_t ReadCAPLENGTH(const struct CapabilityRegisters *cap);
-uint16_t ReadHCIVERSION(const struct CapabilityRegisters *cap);
+uint8_t ReadCAPLENGTH(volatile struct CapabilityRegisters *cap);
+uint16_t ReadHCIVERSION(volatile struct CapabilityRegisters *cap);
