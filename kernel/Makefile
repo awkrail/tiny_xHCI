@@ -5,8 +5,10 @@ OBJS = main.o graphics.o font.o hankaku.o console.o newlib_support.o \
 CFLAGS += -I$(HOME)/tiny_xHCI/x86_64-elf/include \
 					-I$(HOME)/tiny_xHCI/x86_64-elf/freetype2 \
 					-I$(HOME)/edk2/MdePkg/Include -I/$HOME/edk2/Include/X64
-CFLAGS += -Og -Wall -g --target=x86_64-elf -ffreestanding -mno-red-zone \
-					-std=c11
+#CFLAGS += -g -O0 -Wall --target=x86_64-elf -ffreestanding \
+#					-mno-red-zone -std=c11
+CFLAGS += -g -O2 -Wall --target=x86_64-elf -ffreestanding \
+					-mno-red-zone -std=c11
 LDFLAGS += -L$(HOME)/tiny_xHCI/x86_64-elf/lib
 LDFLAGS += --entry KernelMain -z norelro --image-base 0x100000 --static
 

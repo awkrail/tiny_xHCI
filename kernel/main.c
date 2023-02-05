@@ -136,7 +136,6 @@ void KernelMain(const struct FrameBufferConfig *frame_buffer_config)
   printk("max_device_slots: %lx\n", op->CONFIG.bits.max_device_slots_enabled);
   printk("u3_entry: %lx\n", op->CONFIG.bits.u3_entry_enable);
   printk("configuration_info: %lx\n", op->CONFIG.bits.configuration_information_enable);
-  printk("Rsv: %lx\n", op->CONFIG.bits.reserved);
   printk("CONFIG: %lx\n", op->CONFIG.data);
 
   while (1) __asm__("hlt");
