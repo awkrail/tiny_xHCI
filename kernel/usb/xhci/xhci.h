@@ -3,6 +3,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "../../error.h"
 #include "../../logger.h"
 #include "registers.h"
 

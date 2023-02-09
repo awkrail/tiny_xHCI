@@ -1,11 +1,17 @@
 #include "string.h"
 #include "stdbool.h"
 #include "xhci.h"
+#include "devmgr.h"
 
-void InitializeController(struct Controller *xhc,
+void InitializeController(struct DeviceManager *dev_mgr,
+                          struct Controller *xhc,
                           uintptr_t mmio_base,
                           struct Console *console)
 {
+  // Initialize device manager (e.g., DeviceContext)
+  // TODO: Implement them!
+  enum Error err = InitializeDevMgr(kDeviceSize);
+
   // set registers
   xhc->mmio_base = mmio_base;
   SetCapAndOpRegisters(xhc, console);
