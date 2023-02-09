@@ -48,7 +48,8 @@ void PrintAllRegisters(struct Controller *xhc,
                        struct Console *console);
 void SetCapAndOpRegisters(struct Controller *xhc,
                           struct Console *console);
-void ResetController(struct Controller *xhc);
+void ResetController(struct Controller *xhc,
+                     struct Console *console);
 void SetMaxSlotEnabled(struct Controller* xhc,
                        struct Console *console);
 

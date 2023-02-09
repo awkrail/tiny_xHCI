@@ -10,15 +10,12 @@ void InitializeController(struct Controller *xhc,
   xhc->mmio_base = mmio_base;
   SetCapAndOpRegisters(xhc, console);
 
-  // for debug
-  PrintAllRegisters(xhc, console);
-
   // reset controller
-  //RequestHCOwnership();
-  //ResetController(xhc);
+  ResetController(xhc, console);
 
   // set Max Slots Enabled
   SetMaxSlotEnabled(xhc, console);
+
   PrintAllRegisters(xhc, console);
 }
 
@@ -69,19 +66,16 @@ void SetCapAndOpRegisters(struct Controller *xhc,
   xhc->op = (struct OperationalRegisters*)(mmio_base + ReadCAPLENGTH(xhc->cap));
 }
 
-void ResetController(struct Controller *xhc)
+void ResetController(struct Controller *xhc,
+                     struct Console *console)
 {
-  // maybe this function doesn't work
-  union USBCMD_Bitmap usbcmd = xhc->op->USBCMD;
-  usbcmd.bits.interrupter_enable = false;
-  usbcmd.bits.host_system_error_enable = false;
-  usbcmd.bits.enable_wrap_event = false;
+  xhc->op->USBCMD.bits.interrupter_enable = false;
+  xhc->op->USBCMD.bits.host_system_error_enable = false;
+  xhc->op->USBCMD.bits.enable_wrap_event = false;
   if(!xhc->op->USBSTS.bits.host_controller_halted)
-    usbcmd.bits.run_stop = false;
-
-  xhc->op->USBCMD = usbcmd;
-  usbcmd.bits.host_controller_reset = true;
-  xhc->op->USBCMD = usbcmd;
+    xhc->op->USBCMD.bits.run_stop = false;
+  xhc->op->USBCMD.bits.host_controller_reset = true;
+  
   while(xhc->op->USBCMD.bits.host_controller_reset);
   while(xhc->op->USBSTS.bits.controller_not_ready);
 }
@@ -91,6 +85,18 @@ void SetMaxSlotEnabled(struct Controller *xhc,
 {
   xhc->op->CONFIG.bits.max_device_slots_enabled = kDeviceSize;
 }
+
+void AllocateMemory(struct Controller *xhc,
+                    struct Console *console)
+{
+  const uint16_t max_scratchpad_buffers =
+    xhc->cap->HCSPARAMS2.bits.max_scratchpad_buffers_low
+    | (xhc->cap->HCSPARAMS2.bits.max_scratchpad_buffers_high << 5);
+  if(max_scratchpad_buffers > 0) {
+    // allocate memories...
+  }
+}
+
 
 uint8_t ReadCAPLENGTH(volatile struct CapabilityRegisters *cap)
 {
