@@ -1,17 +1,18 @@
 #pragma once
 
-#include <stddef>
-#include <stdint>
+#include <stddef.h>
+#include <stdint.h>
 
 #include "../../error.h"
-//#include "context.h"
-//#include "device.h"
+#include "context.h"
+#include "device.h"
 
 struct DeviceManager
 {
   size_t max_slots;
-  Device** devices;
-  DeviceContext** device_context_ptrs;
+  struct Device **devices;
+  struct DeviceContext **device_context_ptrs;
 };
 
-Error Initialize(size_t max_slots);
+enum Error InitializeDevMgr(struct DeviceManager *devmgr,
+                            size_t max_slots);

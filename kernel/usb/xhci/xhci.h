@@ -5,6 +5,7 @@
 
 #include "../../error.h"
 #include "../../logger.h"
+#include "devmgr.h"
 #include "registers.h"
 
 #define kDeviceSize 8
@@ -42,7 +43,8 @@ struct OperationalRegisters
 } __attribute__((packed));
 
 // Controller-related functions
-void InitializeController(struct Controller *xhc,
+void InitializeController(struct DeviceManager *dev_mgr,
+                          struct Controller *xhc,
                           uintptr_t mmio_base,
                           struct Console *console);
 void PrintAllRegisters(struct Controller *xhc,

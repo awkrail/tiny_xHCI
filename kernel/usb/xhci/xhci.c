@@ -1,7 +1,6 @@
 #include "string.h"
 #include "stdbool.h"
 #include "xhci.h"
-#include "devmgr.h"
 
 void InitializeController(struct DeviceManager *dev_mgr,
                           struct Controller *xhc,
@@ -9,8 +8,7 @@ void InitializeController(struct DeviceManager *dev_mgr,
                           struct Console *console)
 {
   // Initialize device manager (e.g., DeviceContext)
-  // TODO: Implement them!
-  enum Error err = InitializeDevMgr(kDeviceSize);
+  enum Error err = InitializeDevMgr(dev_mgr, kDeviceSize);
 
   // set registers
   xhc->mmio_base = mmio_base;
@@ -98,9 +96,6 @@ void AllocateMemory(struct Controller *xhc,
   const uint16_t max_scratchpad_buffers =
     xhc->cap->HCSPARAMS2.bits.max_scratchpad_buffers_low
     | (xhc->cap->HCSPARAMS2.bits.max_scratchpad_buffers_high << 5);
-  if(max_scratchpad_buffers > 0) {
-    // allocate memories...
-  }
 }
 
 

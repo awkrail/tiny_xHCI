@@ -1,8 +1,8 @@
 #include "devmgr.h"
 #include "memory.h"
 
-Error InitializeDevMgr(struct DeviceManager *devmgr,
-                       size_t max_slots)
+enum Error InitializeDevMgr(struct DeviceManager *devmgr,
+                            size_t max_slots)
 {
   devmgr->max_slots = max_slots;
 
