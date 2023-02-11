@@ -1,9 +1,8 @@
-#include <usb/memory.h>
-#include <stdalign.h>
+#include "memory.h"
 #include <stdint.h>
 
-alignas(64) uint8_t memory_pool[kMemoryPoolSize];
-volatile uintptr_t alloc_ptr = (uintptr_t)memory_pool;
+_Alignas(64) uint8_t memory_pool[kMemoryPoolSize];
+uintptr_t alloc_ptr = (uintptr_t)memory_pool;
 
 uintptr_t CeilPtr(uintptr_t value, unsigned int alignment)
 {
@@ -29,14 +28,14 @@ void* AllocMem(size_t size, unsigned int alignment, unsigned int boundary)
   return (void*)p;
 }
 
-Device**  AllocDeviceArray(size_t num_obj, unsigned int alignment, unsigned int boundary)
+struct USBDevice**  AllocDeviceArray(size_t num_obj, unsigned int alignment, unsigned int boundary)
 {
-  return (Device**)AllocMem(sizeof(Device*) * num_obj, alignment, boundary);
+  return (struct USBDevice**)AllocMem(sizeof(struct Device*) * num_obj, alignment, boundary);
 }
 
-DeviceContext** AllocDeviceContextArray(size_t num_obj, unsigned int alignment, unsigned int boundary)
+struct USBDeviceContext** AllocDeviceContextArray(size_t num_obj, unsigned int alignment, unsigned int boundary)
 {
-  return (DeviceContext**)AllocMem(sizeof(DeviceContext*) * num_obj, alignment, boundary);
+  return (struct DeviceContext**)AllocMem(sizeof(struct DeviceContext*) * num_obj, alignment, boundary);
 }
 
-void FreeMem
+void FreeMem(void* p) {};

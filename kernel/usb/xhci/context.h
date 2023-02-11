@@ -61,7 +61,7 @@ union EndPointContext
   } __attribute__((packed));
 } __attribute__((packed));
 
-struct DeviceContext
+struct USBDeviceContext
 {
   union SlotContext slot_context;
   union EndPointContext ep_contexts[31];

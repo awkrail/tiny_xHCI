@@ -11,7 +11,7 @@ struct DeviceManager
 {
   size_t max_slots;
   struct USBDevice **devices;
-  struct DeviceContext **device_context_ptrs;
+  struct USBDeviceContext **device_context_ptrs;
 };
 
 enum Error InitializeDevMgr(struct DeviceManager *devmgr,

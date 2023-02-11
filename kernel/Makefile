@@ -1,7 +1,7 @@
 TARGET = kernel.elf
 OBJS = main.o graphics.o font.o hankaku.o console.o newlib_support.o \
-			 pci.o error.o asmfunc.o logger.o usb/xhci/xhci.o usb/xhci/memory.c \
-			 usb/xhci/devmgr.c
+			 pci.o error.o asmfunc.o logger.o usb/xhci/xhci.o usb/xhci/memory.o \
+			 usb/xhci/devmgr.o
 
 CFLAGS += -I$(HOME)/tiny_xHCI/x86_64-elf/include \
 					-I$(HOME)/tiny_xHCI/x86_64-elf/freetype2 \
@@ -21,7 +21,7 @@ clean:
 	rm -rf *.o usb/xhci/*.o
 
 kernel.elf: $(OBJS) Makefile
-	ld.lld $(LDFLAGS) -o kernel.elf $(OBJS) -lc -Ax
+	ld.lld $(LDFLAGS) -o kernel.elf $(OBJS) -lc
 
 %.o: %.c Makefile
 	clang $(CPPFLAGS) $(CFLAGS) -c $< -o $@

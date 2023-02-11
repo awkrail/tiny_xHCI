@@ -6,18 +6,18 @@ enum Error InitializeDevMgr(struct DeviceManager *devmgr,
 {
   devmgr->max_slots = max_slots;
 
-  devmgr->devices = AllocDeviceArray(max_slots_ + 1, 0, 0);
-  if(devices == NULL)
+  devmgr->devices = AllocDeviceArray(max_slots + 1, 0, 0);
+  if(devmgr->devices == NULL)
     return kNoEnoughMemory;
 
-  devmgr->device_context_ptrs = AllocDeviceContextArray(max_slots_ + 1, 64, 4096);
+  devmgr->device_context_ptrs = AllocDeviceContextArray(max_slots + 1, 64, 4096);
   if(devmgr->device_context_ptrs == NULL) {
     FreeMem(devmgr->devices);
     return kNoEnoughMemory;
   }
 
   // Initialize device context
-  for(size_t i = 0; i <= max_slots_; ++i) {
+  for(size_t i = 0; i <= max_slots; ++i) {
     devmgr->devices[i] = NULL;
     devmgr->device_context_ptrs[i] = NULL;
   }

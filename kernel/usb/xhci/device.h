@@ -2,6 +2,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 #include "../../error.h"
 #include "context.h"
@@ -30,7 +31,7 @@ struct USBDevice
   int num_ep_configs;
   // ArrayMap<SetupData, ClassDriver*, 4> event_waiters;
 
-  _Alignas(64) struct DeviceContext ctx;
+  _Alignas(64) struct USBDeviceContext ctx;
   //alignas(64) struct InputContext input_ctx;
 
   uint8_t slot_id;
