@@ -10,7 +10,7 @@
 struct DeviceManager
 {
   size_t max_slots;
-  struct Device **devices;
+  struct USBDevice **devices;
   struct DeviceContext **device_context_ptrs;
 };
 

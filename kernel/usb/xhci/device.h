@@ -17,7 +17,7 @@ enum State
 };
 
 
-struct Device 
+struct USBDevice 
 {
   //ClassDriver *class_driver[16];
   uint8_t buf[256];
@@ -30,7 +30,7 @@ struct Device
   int num_ep_configs;
   // ArrayMap<SetupData, ClassDriver*, 4> event_waiters;
 
-  alignas(64) struct DeviceContext ctx;
+  _Alignas(64) struct DeviceContext ctx;
   //alignas(64) struct InputContext input_ctx;
 
   uint8_t slot_id;

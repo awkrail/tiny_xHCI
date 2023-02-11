@@ -21,7 +21,7 @@ clean:
 	rm -rf *.o usb/xhci/*.o
 
 kernel.elf: $(OBJS) Makefile
-	ld.lld $(LDFLAGS) -o kernel.elf $(OBJS) -lc
+	ld.lld $(LDFLAGS) -o kernel.elf $(OBJS) -lc -Ax
 
 %.o: %.c Makefile
 	clang $(CPPFLAGS) $(CFLAGS) -c $< -o $@

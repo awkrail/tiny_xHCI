@@ -1,4 +1,5 @@
 #include <usb/memory.h>
+#include <stdalign.h>
 #include <stdint.h>
 
 alignas(64) uint8_t memory_pool[kMemoryPoolSize];

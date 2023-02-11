@@ -110,6 +110,8 @@ void KernelMain(const struct FrameBufferConfig *frame_buffer_config)
   // 1. Initialize controller
   // 1.1 Load Capability / Operational Registers
   struct Controller xhc;
-  InitializeController(&xhc, xhc_mmio_base, &console);
+  struct DeviceManager dev_mgr;
+  InitializeController(&dev_mgr, &xhc, 
+                       xhc_mmio_base, &console);
   while (1) __asm__("hlt");
 }
