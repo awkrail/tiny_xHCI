@@ -32,7 +32,7 @@ struct USBDevice
   // ArrayMap<SetupData, ClassDriver*, 4> event_waiters;
 
   _Alignas(64) struct USBDeviceContext ctx;
-  //alignas(64) struct InputContext input_ctx;
+  _Alignas(64) struct InputContext input_ctx;
 
   uint8_t slot_id;
   //struct DoorbellRegister *dbreg;

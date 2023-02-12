@@ -66,3 +66,21 @@ struct USBDeviceContext
   union SlotContext slot_context;
   union EndPointContext ep_contexts[31];
 } __attribute__((packed));
+
+struct InputControlContext
+{
+  uint32_t drop_context_flags;
+  uint32_t add_context_flags;
+  uint32_t reserved1[5];
+  uint8_t configuration_value;
+  uint8_t interface_number;
+  uint8_t alternate_setting;
+  uint8_t reserved2;
+} __attribute__((packed));
+
+struct InputContext
+{
+  struct InputControlContext input_control_context;
+  union SlotContext slot_context;
+  union EndPointContext ep_contexts[31];
+} __attribute__((packed));

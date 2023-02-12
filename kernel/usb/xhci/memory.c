@@ -35,7 +35,7 @@ struct USBDevice**  AllocDeviceArray(size_t num_obj, unsigned int alignment, uns
 
 struct USBDeviceContext** AllocDeviceContextArray(size_t num_obj, unsigned int alignment, unsigned int boundary)
 {
-  return (struct DeviceContext**)AllocMem(sizeof(struct DeviceContext*) * num_obj, alignment, boundary);
+  return (struct USBDeviceContext**)AllocMem(sizeof(struct USBDeviceContext*) * num_obj, alignment, boundary);
 }
 
 void FreeMem(void* p) {};
