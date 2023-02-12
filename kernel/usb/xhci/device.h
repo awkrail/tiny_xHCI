@@ -35,7 +35,7 @@ struct USBDevice
   _Alignas(64) struct InputContext input_ctx;
 
   uint8_t slot_id;
-  //struct DoorbellRegister *dbreg;
+  union Doorbell_Bitmap *dbreg;
 
   enum State state;
   //Ring *transfer_rings[31];

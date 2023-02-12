@@ -321,7 +321,6 @@ union USBLEGSUP_Bitmap
   } __attribute__((packed)) bits;
 } __attribute__((packed));
 
-
 // Compositional registers
 struct CapabilityRegisters
 {
