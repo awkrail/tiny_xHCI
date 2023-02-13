@@ -35,6 +35,7 @@ void SetCapAndOpRegisters(struct Controller *xhc);
 void ResetController(struct Controller *xhc);
 void SetMaxSlotEnabled(struct Controller* xhc);
 void SetDCBAAPRegister(struct Controller *xhc);
+void StartController(struct Controller *xhc);
 
 // Initialize Command ring
 enum Error InitializeCommandRing(struct Controller *xhc, size_t buf_size);
@@ -42,6 +43,11 @@ enum Error RegisterCommandRing(struct Controller *xhc);
 
 // Initialize Event Ring
 
+
+// Initialize Register Set Array
+void InitializeInterruptRegisterSetArray(struct Controller *xhc,
+                                         volatile struct InterrupterRegisterSetArrayWrapper 
+                                          *primary_interrupter);
 
 // Register-related functions
 uint8_t ReadCAPLENGTH(volatile struct CapabilityRegisters *cap);

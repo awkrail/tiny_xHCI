@@ -364,3 +364,11 @@ struct InterrupterRegisterSet
   union ERSTBA_Bitmap ERSTBA;
   union ERDP_Bitmap ERDP;
 } __attribute__((packed));
+
+// ArrayWrapper
+struct InterrupterRegisterSetArrayWrapper
+{
+  struct InterrupterRegisterSet *array;
+  size_t size;
+};
+

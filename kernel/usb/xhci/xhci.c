@@ -29,8 +29,17 @@ void InitializeController(struct DeviceManager *dev_mgr,
   err = RegisterCommandRing(xhc);
 
   // Event Ring configuration
-  // Interrupt config
+  volatile struct InterrupterRegisterSetArrayWrapper primary_interrupter;
+  InitializeInterruptRegisterSetArray(xhc, &primary_interrupter);
+
+  //err = InitializeEventRing(32, primary_interrupter);
+
+  // Enable interrupt for the primary interrupter
+  //EnableInterruptForPrimaryInterrupter(&primary_interrupter)
+
   // Run controller
+  StartController(xhc);
+  //return err;
 }
 
 // for debug
@@ -122,6 +131,19 @@ enum Error RegisterCommandRing(struct Controller *xhc)
   return kSuccess;
 }
 
+void InitializeInterruptRegisterSetArray(struct Controller *xhc,
+                                         volatile struct InterrupterRegisterSetArrayWrapper 
+                                          *primary_interrupter)
+{
+  primary_interrupter->array = (struct InterrupterRegisterSet*)
+    (xhc->mmio_base + (xhc->cap->RTSOFF.bits.runtime_register_space_offset << 5) + 0x20);
+  primary_interrupter->size = 1024;
+}
+
+void StartController(struct Controller *xhc)
+{
+  xhc->op->USBCMD.bits.interrupter_enable = true;
+}
 
 uint8_t ReadCAPLENGTH(volatile struct CapabilityRegisters *cap)
 {
