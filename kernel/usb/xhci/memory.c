@@ -38,4 +38,9 @@ struct USBDeviceContext** AllocDeviceContextArray(size_t num_obj, unsigned int a
   return (struct USBDeviceContext**)AllocMem(sizeof(struct USBDeviceContext*) * num_obj, alignment, boundary);
 }
 
+union TRB* AllocTRBArray(size_t num_obj, unsigned int alignment, unsigned int boundary)
+{
+  return (union TRB*)AllocMem(sizeof(union TRB) * num_obj, alignment, boundary);
+}
+
 void FreeMem(void* p) {};

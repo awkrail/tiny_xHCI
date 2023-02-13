@@ -24,10 +24,9 @@ void InitializeController(struct DeviceManager *dev_mgr,
   // Set DCBAAP Register
   SetDCBAAPRegister(xhc);
 
-  PrintAllRegisters(xhc, console);
-
   // Command Ring configuration
-  //InitializeCommandRing();
+  err = InitializeCommandRing(xhc, 32);
+  err = RegisterCommandRing(xhc);
 
   // Event Ring configuration
   // Interrupt config
@@ -57,10 +56,11 @@ void PrintAllRegisters(struct Controller *xhc,
       console,
       "USBCMD=%08x\n"
       "USBSTS=%08x\n"
+      "CRCR=%08x\n"
       "DCBAAP=%08x\n"
       "CONFIG=%08x\n",
       op->USBCMD, op->USBSTS,
-      op->DCBAAP, op->CONFIG.data);
+      op->CRCR, op->DCBAAP, op->CONFIG);
 }
 
 void SetCapAndOpRegisters(struct Controller *xhc)
@@ -68,6 +68,7 @@ void SetCapAndOpRegisters(struct Controller *xhc)
   uintptr_t mmio_base = xhc->mmio_base;
   xhc->cap = (struct CapabilityRegisters*)mmio_base;
   xhc->op = (struct OperationalRegisters*)(mmio_base + ReadCAPLENGTH(xhc->cap));
+  xhc->max_ports = xhc->cap->HCSPARAMS1.bits.max_ports;
 }
 
 void ResetController(struct Controller *xhc)
@@ -92,6 +93,33 @@ void SetDCBAAPRegister(struct Controller *xhc)
 {
   uint64_t value = (uint64_t)xhc->dev_mgr->device_context_ptrs;
   xhc->op->DCBAAP.bits.device_context_base_address_array_pointer = value >> 6;
+}
+
+enum Error InitializeCommandRing(struct Controller *xhc, size_t buf_size)
+{
+  if(xhc->cr.buf != NULL)
+    FreeMem(xhc->cr.buf);
+
+  xhc->cr.cycle_bit = true;
+  xhc->cr.write_index = 0;
+  xhc->cr.buf_size = buf_size;
+
+  xhc->cr.buf = AllocTRBArray(buf_size, 64, 64 * 1024);
+  if(xhc->cr.buf == NULL)
+    return kNoEnoughMemory;
+
+  memset(xhc->cr.buf, 0, buf_size * sizeof(union TRB));
+  return kSuccess;
+}
+
+enum Error RegisterCommandRing(struct Controller *xhc)
+{
+
+  xhc->op->CRCR.bits.ring_cycle_state = true;
+  xhc->op->CRCR.bits.command_stop = false;
+  xhc->op->CRCR.bits.command_abort = false;
+  xhc->op->CRCR.bits.command_ring_pointer = ((uint64_t)xhc->cr.buf) >> 6;
+  return kSuccess;
 }
 
 

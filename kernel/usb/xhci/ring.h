@@ -6,7 +6,7 @@
 
 struct Ring
 {
-  struct TRB *buf;
+  union TRB *buf;
   size_t buf_size;
   bool cycle_bit;
   size_t write_index;
@@ -14,9 +14,9 @@ struct Ring
 
 struct EventRing
 {
-  struct TRB *buf;
+  union TRB *buf;
   size_t buf_size;
   bool cycle_bit;
-  EventRingSegmentTableEntry erst;
-  InterrupterRegisterSet *interrupter;
+  //EventRingSegmentTableEntry erst;
+  //InterrupterRegisterSet *interrupter;
 };

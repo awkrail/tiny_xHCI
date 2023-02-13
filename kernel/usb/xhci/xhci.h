@@ -7,6 +7,8 @@
 #include "../../logger.h"
 #include "devmgr.h"
 #include "registers.h"
+#include "ring.h"
+#include "trb.h"
 
 #define kDeviceSize 8
 
@@ -18,7 +20,7 @@ struct Controller
 
   volatile struct DeviceManager *dev_mgr;
   uint8_t max_ports;
-  //struct Ring cr;
+  struct Ring cr;
   //struct EventRing er;
 };
 
@@ -33,6 +35,13 @@ void SetCapAndOpRegisters(struct Controller *xhc);
 void ResetController(struct Controller *xhc);
 void SetMaxSlotEnabled(struct Controller* xhc);
 void SetDCBAAPRegister(struct Controller *xhc);
+
+// Initialize Command ring
+enum Error InitializeCommandRing(struct Controller *xhc, size_t buf_size);
+enum Error RegisterCommandRing(struct Controller *xhc);
+
+// Initialize Event Ring
+
 
 // Register-related functions
 uint8_t ReadCAPLENGTH(volatile struct CapabilityRegisters *cap);
