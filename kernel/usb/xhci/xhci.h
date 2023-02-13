@@ -15,6 +15,11 @@ struct Controller
   uintptr_t mmio_base;
   volatile struct CapabilityRegisters *cap;
   volatile struct OperationalRegisters *op;
+
+  volatile struct DeviceManager *dev_mgr;
+  uint8_t max_ports;
+  //struct Ring cr;
+  //struct EventRing er;
 };
 
 // Controller-related functions
@@ -24,14 +29,10 @@ void InitializeController(struct DeviceManager *dev_mgr,
                           struct Console *console);
 void PrintAllRegisters(struct Controller *xhc,
                        struct Console *console);
-void SetCapAndOpRegisters(struct Controller *xhc,
-                          struct Console *console);
-void ResetController(struct Controller *xhc,
-                     struct Console *console);
-void SetMaxSlotEnabled(struct Controller* xhc,
-                       struct Console *console);
-void SetDCBAAPRegister(struct Controller *xhc,
-                       struct DeviceManager *dev_mgr);
+void SetCapAndOpRegisters(struct Controller *xhc);
+void ResetController(struct Controller *xhc);
+void SetMaxSlotEnabled(struct Controller* xhc);
+void SetDCBAAPRegister(struct Controller *xhc);
 
 // Register-related functions
 uint8_t ReadCAPLENGTH(volatile struct CapabilityRegisters *cap);

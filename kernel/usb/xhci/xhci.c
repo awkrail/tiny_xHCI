@@ -9,27 +9,25 @@ void InitializeController(struct DeviceManager *dev_mgr,
 {
   // Initialize device manager (e.g., DeviceContext)
   enum Error err = InitializeDevMgr(dev_mgr, kDeviceSize);
-  Log(kDebug, console, "dev_mgr->devices:%p\n", dev_mgr->devices);
-  Log(kDebug, console, "dev_mgr->device_context_ptrs:%p\n", dev_mgr->device_context_ptrs);
+  xhc->dev_mgr = dev_mgr;
 
   // set registers
   xhc->mmio_base = mmio_base;
-  SetCapAndOpRegisters(xhc, console);
+  SetCapAndOpRegisters(xhc);
 
   // reset controller
-  ResetController(xhc, console);
+  ResetController(xhc);
 
   // set Max Slots Enabled
-  SetMaxSlotEnabled(xhc, console);
+  SetMaxSlotEnabled(xhc);
 
-  PrintAllRegisters(xhc, console);
-  
   // Set DCBAAP Register
-  SetDCBAAPRegister(xhc, dev_mgr);
+  SetDCBAAPRegister(xhc);
 
   PrintAllRegisters(xhc, console);
 
   // Command Ring configuration
+  //InitializeCommandRing();
 
   // Event Ring configuration
   // Interrupt config
@@ -65,16 +63,14 @@ void PrintAllRegisters(struct Controller *xhc,
       op->DCBAAP, op->CONFIG.data);
 }
 
-void SetCapAndOpRegisters(struct Controller *xhc,
-                          struct Console *console)
+void SetCapAndOpRegisters(struct Controller *xhc)
 {
   uintptr_t mmio_base = xhc->mmio_base;
   xhc->cap = (struct CapabilityRegisters*)mmio_base;
   xhc->op = (struct OperationalRegisters*)(mmio_base + ReadCAPLENGTH(xhc->cap));
 }
 
-void ResetController(struct Controller *xhc,
-                     struct Console *console)
+void ResetController(struct Controller *xhc)
 {
   xhc->op->USBCMD.bits.interrupter_enable = false;
   xhc->op->USBCMD.bits.host_system_error_enable = false;
@@ -87,16 +83,14 @@ void ResetController(struct Controller *xhc,
   while(xhc->op->USBSTS.bits.controller_not_ready);
 }
 
-void SetMaxSlotEnabled(struct Controller *xhc,
-                       struct Console *console)
+void SetMaxSlotEnabled(struct Controller *xhc)
 {
   xhc->op->CONFIG.bits.max_device_slots_enabled = kDeviceSize;
 }
 
-void SetDCBAAPRegister(struct Controller *xhc,
-                       struct DeviceManager *dev_mgr)
+void SetDCBAAPRegister(struct Controller *xhc)
 {
-  uint64_t value = (uint64_t)dev_mgr->device_context_ptrs;
+  uint64_t value = (uint64_t)xhc->dev_mgr->device_context_ptrs;
   xhc->op->DCBAAP.bits.device_context_base_address_array_pointer = value >> 6;
 }
 
