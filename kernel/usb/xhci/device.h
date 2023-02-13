@@ -7,7 +7,7 @@
 #include "../../error.h"
 #include "context.h"
 #include "registers.h"
-//#include "trb.h"
+#include "trb.h"
 
 enum State
 {
@@ -29,6 +29,7 @@ struct USBDevice
   bool is_initialized; // false, default
   int initialize_phase; // 0, default
   int num_ep_configs;
+  // TODO
   // ArrayMap<SetupData, ClassDriver*, 4> event_waiters;
 
   _Alignas(64) struct USBDeviceContext ctx;
@@ -38,7 +39,7 @@ struct USBDevice
   union Doorbell_Bitmap *dbreg;
 
   enum State state;
-  //Ring *transfer_rings[31];
+  struct Ring *transfer_rings[31];
   // arraymap: TODO
   // ArrayMap<const void*, const SetupStageTRB*, 16> setup_stage_map;
 };

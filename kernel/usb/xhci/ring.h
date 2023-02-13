@@ -2,11 +2,11 @@
 #include "../../error.h"
 #include "memory.h"
 #include "registers.h"
-//#include "trb.h"
+#include "trb.h"
 
 struct Ring
 {
-  //TRB* buf;
+  struct TRB *buf;
   size_t buf_size;
   bool cycle_bit;
   size_t write_index;
@@ -14,7 +14,7 @@ struct Ring
 
 struct EventRing
 {
-  //TRB* buf;
+  struct TRB *buf;
   size_t buf_size;
   bool cycle_bit;
   EventRingSegmentTableEntry erst;

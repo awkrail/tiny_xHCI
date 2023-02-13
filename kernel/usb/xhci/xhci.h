@@ -30,6 +30,8 @@ void ResetController(struct Controller *xhc,
                      struct Console *console);
 void SetMaxSlotEnabled(struct Controller* xhc,
                        struct Console *console);
+void SetDCBAAPRegister(struct Controller *xhc,
+                       struct DeviceManager *dev_mgr);
 
 // Register-related functions
 uint8_t ReadCAPLENGTH(volatile struct CapabilityRegisters *cap);

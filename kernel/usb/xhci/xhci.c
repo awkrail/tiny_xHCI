@@ -9,6 +9,8 @@ void InitializeController(struct DeviceManager *dev_mgr,
 {
   // Initialize device manager (e.g., DeviceContext)
   enum Error err = InitializeDevMgr(dev_mgr, kDeviceSize);
+  Log(kDebug, console, "dev_mgr->devices:%p\n", dev_mgr->devices);
+  Log(kDebug, console, "dev_mgr->device_context_ptrs:%p\n", dev_mgr->device_context_ptrs);
 
   // set registers
   xhc->mmio_base = mmio_base;
@@ -21,6 +23,17 @@ void InitializeController(struct DeviceManager *dev_mgr,
   SetMaxSlotEnabled(xhc, console);
 
   PrintAllRegisters(xhc, console);
+  
+  // Set DCBAAP Register
+  SetDCBAAPRegister(xhc, dev_mgr);
+
+  PrintAllRegisters(xhc, console);
+
+  // Command Ring configuration
+
+  // Event Ring configuration
+  // Interrupt config
+  // Run controller
 }
 
 // for debug
@@ -29,16 +42,6 @@ void PrintAllRegisters(struct Controller *xhc,
 {
   volatile struct CapabilityRegisters *cap = xhc->cap;
   volatile struct OperationalRegisters *op = xhc->op;
-
-  Log(kDebug,
-      console,
-      "len(CapabilityRegisters)=%u\n",
-      sizeof(struct CapabilityRegisters));
-
-  Log(kDebug,
-      console,
-      "len(OperationalRegisters)=%u\n",
-      sizeof(struct OperationalRegisters));
 
   Log(kDebug,
       console,
@@ -90,12 +93,11 @@ void SetMaxSlotEnabled(struct Controller *xhc,
   xhc->op->CONFIG.bits.max_device_slots_enabled = kDeviceSize;
 }
 
-void AllocateMemory(struct Controller *xhc,
-                    struct Console *console)
+void SetDCBAAPRegister(struct Controller *xhc,
+                       struct DeviceManager *dev_mgr)
 {
-  const uint16_t max_scratchpad_buffers =
-    xhc->cap->HCSPARAMS2.bits.max_scratchpad_buffers_low
-    | (xhc->cap->HCSPARAMS2.bits.max_scratchpad_buffers_high << 5);
+  uint64_t value = (uint64_t)dev_mgr->device_context_ptrs;
+  xhc->op->DCBAAP.bits.device_context_base_address_array_pointer = value >> 6;
 }
 
 

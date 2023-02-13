@@ -12,10 +12,10 @@ uintptr_t CeilPtr(uintptr_t value, unsigned int alignment)
 void* AllocMem(size_t size, unsigned int alignment, unsigned int boundary)
 {
   if(alignment > 0)
-    alloc_ptr = CeilPtr(alloc_ptr, boundary);
+    alloc_ptr = CeilPtr(alloc_ptr, alignment);
 
   if(boundary > 0) {
-    unsigned int next_boundary = CeilPtr(alloc_ptr, boundary);
+    uintptr_t  next_boundary = CeilPtr(alloc_ptr, boundary);
     if(next_boundary < alloc_ptr + size)
       alloc_ptr = next_boundary;
   }
