@@ -1,4 +1,7 @@
+#pragma once 
+
 #include <stdint.h>
+
 #include "../../error.h"
 #include "memory.h"
 #include "registers.h"
@@ -12,11 +15,24 @@ struct Ring
   size_t write_index;
 };
 
+union EventRingSegmentTableEntry
+{
+  uint32_t data[4];
+  struct
+  {
+    uint64_t ring_segment_base_address;
+    uint32_t ring_segment_size: 16;
+    uint32_t : 16;
+    uint32_t : 32;
+  } __attribute__((packed)) bits;
+};
+
+
 struct EventRing
 {
   union TRB *buf;
   size_t buf_size;
   bool cycle_bit;
-  //EventRingSegmentTableEntry erst;
-  //InterrupterRegisterSet *interrupter;
+  union EventRingSegmentTableEntry *erst;
+  struct InterrupterRegisterSet *interrupter;
 };

@@ -43,4 +43,9 @@ union TRB* AllocTRBArray(size_t num_obj, unsigned int alignment, unsigned int bo
   return (union TRB*)AllocMem(sizeof(union TRB) * num_obj, alignment, boundary);
 }
 
+union EventRingSegmentTableEntry* AllocEventRingSegmentTableEntryArray(size_t num_obj, unsigned int alignment, unsigned int boundary)
+{
+  return (union EventRingSegmentTableEntry*)AllocMem(sizeof(union EventRingSegmentTableEntry) * num_obj, alignment, boundary);
+}
+
 void FreeMem(void* p) {};

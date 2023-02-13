@@ -251,7 +251,7 @@ union IMOD_Bitmap
   {
     uint32_t interrupt_moderation_interval: 16;
     uint32_t interrupt_moderation_counter: 16;
-  } __attribute__((packed));
+  } __attribute__((packed)) bits;
 } __attribute__((packed));
 
 union ERSTSZ_Bitmap
@@ -261,7 +261,7 @@ union ERSTSZ_Bitmap
   {
     uint32_t event_ring_segment_table_size: 16;
     uint32_t : 16;
-  } __attribute__((packed));
+  } __attribute__((packed)) bits;
 } __attribute__((packed));
 
 union ERSTBA_Bitmap
@@ -282,7 +282,7 @@ union ERDP_Bitmap
     uint64_t dequeue_erst_segment_index: 3;
     uint64_t event_handler_busy: 1;
     uint64_t event_ring_dequeue_pointer: 60;
-  } __attribute__((packed));
+  } __attribute__((packed)) bits;
 } __attribute__((packed));
 
 union Doorbell_Bitmap
@@ -304,7 +304,7 @@ union ExtendedRegister_Bitmap
     uint32_t capability_id: 8;
     uint32_t next_pointer: 8;
     uint32_t value: 16;
-  } __attribute__((packed));
+  } __attribute__((packed)) bits;
 } __attribute__((packed));
 
 union USBLEGSUP_Bitmap

@@ -1,5 +1,3 @@
-#include "string.h"
-#include "stdbool.h"
 #include "xhci.h"
 
 void InitializeController(struct DeviceManager *dev_mgr,
@@ -32,14 +30,16 @@ void InitializeController(struct DeviceManager *dev_mgr,
   volatile struct InterrupterRegisterSetArrayWrapper primary_interrupter;
   InitializeInterruptRegisterSetArray(xhc, &primary_interrupter);
 
-  //err = InitializeEventRing(32, primary_interrupter);
+  err = InitializeEventRing(xhc, primary_interrupter.array, 32);
 
   // Enable interrupt for the primary interrupter
-  //EnableInterruptForPrimaryInterrupter(&primary_interrupter)
+  EnableInterruptForPrimaryInterrupter(primary_interrupter.array);
 
   // Run controller
   StartController(xhc);
   //return err;
+  
+  Log(kDebug, console, "err: %s\n", GetErrName(err));
 }
 
 // for debug
@@ -104,6 +104,15 @@ void SetDCBAAPRegister(struct Controller *xhc)
   xhc->op->DCBAAP.bits.device_context_base_address_array_pointer = value >> 6;
 }
 
+void InitializeInterruptRegisterSetArray(struct Controller *xhc,
+                                         volatile struct InterrupterRegisterSetArrayWrapper 
+                                          *primary_interrupter)
+{
+  primary_interrupter->array = (struct InterrupterRegisterSet*)
+    (xhc->mmio_base + (xhc->cap->RTSOFF.bits.runtime_register_space_offset << 5) + 0x20);
+  primary_interrupter->size = 1024;
+}
+
 enum Error InitializeCommandRing(struct Controller *xhc, size_t buf_size)
 {
   if(xhc->cr.buf != NULL)
@@ -131,13 +140,41 @@ enum Error RegisterCommandRing(struct Controller *xhc)
   return kSuccess;
 }
 
-void InitializeInterruptRegisterSetArray(struct Controller *xhc,
-                                         volatile struct InterrupterRegisterSetArrayWrapper 
-                                          *primary_interrupter)
+enum Error InitializeEventRing(struct Controller *xhc,
+                               struct InterrupterRegisterSet *interrupter,
+                               size_t buf_size)
 {
-  primary_interrupter->array = (struct InterrupterRegisterSet*)
-    (xhc->mmio_base + (xhc->cap->RTSOFF.bits.runtime_register_space_offset << 5) + 0x20);
-  primary_interrupter->size = 1024;
+  if(xhc->er.buf != NULL)
+    FreeMem(xhc->er.buf);
+
+  xhc->er.cycle_bit = true;
+  xhc->er.buf_size = buf_size;
+  xhc->er.interrupter = interrupter;
+
+  xhc->er.buf = AllocTRBArray(buf_size, 64, 64 * 1024);
+  if(xhc->er.buf == NULL)
+    return kNoEnoughMemory;
+  memset(xhc->er.buf, 0, buf_size * sizeof(union TRB));
+
+  xhc->er.erst = AllocEventRingSegmentTableEntryArray(1, 64, 64 * 1024);
+  if(xhc->er.erst == NULL) {
+    FreeMem(xhc->er.buf);
+    return kNoEnoughMemory;
+  }
+  memset(xhc->er.erst, 0, 1 * sizeof(union EventRingSegmentTableEntry));
+
+  xhc->er.erst[0].bits.ring_segment_base_address = (uint64_t)xhc->er.buf;
+  xhc->er.erst[0].bits.ring_segment_size = buf_size;
+
+  interrupter->ERSTSZ.bits.event_ring_segment_table_size = 1;
+  interrupter->ERSTBA.bits.event_ring_segment_table_base_address = ((uint64_t)xhc->er.erst) >> 6;
+  return kSuccess;
+}
+
+void EnableInterruptForPrimaryInterrupter(struct InterrupterRegisterSet *primary_interrupter)
+{
+  primary_interrupter->IMAN.bits.interrupt_pending = true;
+  primary_interrupter->IMAN.bits.interrupt_enable = true;
 }
 
 void StartController(struct Controller *xhc)

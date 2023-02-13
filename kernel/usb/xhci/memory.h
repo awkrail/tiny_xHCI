@@ -2,6 +2,7 @@
 
 #include <stddef.h>
 #include "device.h"
+#include "ring.h"
 
 #define kMemoryPoolSize 131072 // 4096*32
 
@@ -9,6 +10,7 @@
 struct USBDevice** AllocDeviceArray(size_t size, unsigned int alignment, unsigned int boundary);
 struct USBDeviceContext** AllocDeviceContextArray(size_t num_obj, unsigned int alignment, unsigned int boundary);
 union TRB* AllocTRBArray(size_t num_obj, unsigned int alignment, unsigned int boundary);
+union EventRingSegmentTableEntry* AllocEventRingSegmentTableEntryArray(size_t num_obj, unsigned int alignment, unsigned int boundary);
 
 void* AllocMem(size_t size, unsigned int alignment, unsigned int boundary);
 

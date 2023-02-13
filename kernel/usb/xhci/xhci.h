@@ -2,6 +2,8 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <string.h>
+#include "stdbool.h"
 
 #include "../../error.h"
 #include "../../logger.h"
@@ -21,7 +23,7 @@ struct Controller
   volatile struct DeviceManager *dev_mgr;
   uint8_t max_ports;
   struct Ring cr;
-  //struct EventRing er;
+  struct EventRing er;
 };
 
 // Controller-related functions
@@ -42,11 +44,15 @@ enum Error InitializeCommandRing(struct Controller *xhc, size_t buf_size);
 enum Error RegisterCommandRing(struct Controller *xhc);
 
 // Initialize Event Ring
-
+enum Error InitializeEventRing(struct Controller *xhc,
+                               struct InterrupterRegisterSet *interrupter,
+                               size_t buf_size);
 
 // Initialize Register Set Array
 void InitializeInterruptRegisterSetArray(struct Controller *xhc,
-                                         volatile struct InterrupterRegisterSetArrayWrapper 
+                                         volatile struct InterrupterRegisterSetArrayWrapper
+                                          *primary_interrupter);
+void EnableInterruptForPrimaryInterrupter(struct InterrupterRegisterSet 
                                           *primary_interrupter);
 
 // Register-related functions
