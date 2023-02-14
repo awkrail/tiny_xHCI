@@ -107,8 +107,31 @@ void KernelMain(const struct FrameBufferConfig *frame_buffer_config)
   // Initialize xHCI controller
   struct Controller xhc;
   struct DeviceManager dev_mgr;
-  InitializeController(&dev_mgr, &xhc, 
-                       xhc_mmio_base, &console);
+  err = InitializeController(&dev_mgr, &xhc, xhc_mmio_base);
+  Log(kDebug, &console, "xHC Initialize: %s\n", GetErrName(err));
+
+  /**
+  for(int i = 1; i <= xhc.max_ports; ++i) {
+    auto port = xHCIPortAt(i);
+    Log(kDebug, "Port: %d: IsConnected=%d\n", i, IsPortConnected(port));
+    if(IsPortConnected(port)) {
+      err = ConfigurePort(xhc, port);
+      if(err) {
+        Log(kError, "failed to configure port: %s at %s:%d\n",
+            GetErrName(err), GetFileName(err), GetLineName(err));
+        continue;
+      }
+    }
+  }
+
+  while (1) {
+    err = ProcessEvent(xhc);
+    if(err) {
+      Log(kError, "Error while ProcessEvent: %s at %s:%d\n",
+          GetErrName(err), GetFileName(err), GetLineName(err));
+    }
+  }
+  **/
 
   while (1) __asm__("hlt");
 }

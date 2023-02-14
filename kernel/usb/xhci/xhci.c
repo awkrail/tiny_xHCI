@@ -1,8 +1,8 @@
 #include "xhci.h"
 
-void InitializeController(struct DeviceManager *dev_mgr,
-                          struct Controller *xhc,
-                          uintptr_t mmio_base)
+enum Error InitializeController(struct DeviceManager *dev_mgr,
+                                struct Controller *xhc,
+                                uintptr_t mmio_base)
 {
   // Initialize device manager (e.g., DeviceContext)
   enum Error err = InitializeDevMgr(dev_mgr, kDeviceSize);
@@ -10,16 +10,16 @@ void InitializeController(struct DeviceManager *dev_mgr,
 
   // set registers
   xhc->mmio_base = mmio_base;
-  SetCapAndOpRegisters(xhc);
+  err = SetCapAndOpRegisters(xhc);
 
   // reset controller
-  ResetController(xhc);
+  err = ResetController(xhc);
 
   // set Max Slots Enabled
-  SetMaxSlotEnabled(xhc);
+  err = SetMaxSlotEnabled(xhc);
 
   // Set DCBAAP Register
-  SetDCBAAPRegister(xhc);
+  err = SetDCBAAPRegister(xhc);
 
   // Command Ring configuration
   err = InitializeCommandRing(xhc, 32);
@@ -27,15 +27,17 @@ void InitializeController(struct DeviceManager *dev_mgr,
 
   // Event Ring configuration
   volatile struct InterrupterRegisterSetArrayWrapper primary_interrupter;
-  InitializeInterruptRegisterSetArray(xhc, &primary_interrupter);
+  err = InitializeInterruptRegisterSetArray(xhc, &primary_interrupter);
 
   err = InitializeEventRing(xhc, primary_interrupter.array, 32);
 
   // Enable interrupt for the primary interrupter
-  EnableInterruptForPrimaryInterrupter(primary_interrupter.array);
+  err = EnableInterruptForPrimaryInterrupter(primary_interrupter.array);
 
   // Run controller
-  StartController(xhc);
+  err = StartController(xhc);
+
+  return err;
 }
 
 // for debug
@@ -68,15 +70,16 @@ void PrintAllRegisters(struct Controller *xhc,
       op->CRCR, op->DCBAAP, op->CONFIG);
 }
 
-void SetCapAndOpRegisters(struct Controller *xhc)
+enum Error SetCapAndOpRegisters(struct Controller *xhc)
 {
   uintptr_t mmio_base = xhc->mmio_base;
   xhc->cap = (struct CapabilityRegisters*)mmio_base;
   xhc->op = (struct OperationalRegisters*)(mmio_base + ReadCAPLENGTH(xhc->cap));
   xhc->max_ports = xhc->cap->HCSPARAMS1.bits.max_ports;
+  return kSuccess;
 }
 
-void ResetController(struct Controller *xhc)
+enum Error ResetController(struct Controller *xhc)
 {
   xhc->op->USBCMD.bits.interrupter_enable = false;
   xhc->op->USBCMD.bits.host_system_error_enable = false;
@@ -87,26 +90,30 @@ void ResetController(struct Controller *xhc)
   
   while(xhc->op->USBCMD.bits.host_controller_reset);
   while(xhc->op->USBSTS.bits.controller_not_ready);
+  return kSuccess;
 }
 
-void SetMaxSlotEnabled(struct Controller *xhc)
+enum Error SetMaxSlotEnabled(struct Controller *xhc)
 {
   xhc->op->CONFIG.bits.max_device_slots_enabled = kDeviceSize;
+  return kSuccess;
 }
 
-void SetDCBAAPRegister(struct Controller *xhc)
+enum Error SetDCBAAPRegister(struct Controller *xhc)
 {
   uint64_t value = (uint64_t)xhc->dev_mgr->device_context_ptrs;
   xhc->op->DCBAAP.bits.device_context_base_address_array_pointer = value >> 6;
+  return kSuccess;
 }
 
-void InitializeInterruptRegisterSetArray(struct Controller *xhc,
-                                         volatile struct InterrupterRegisterSetArrayWrapper 
-                                          *primary_interrupter)
+enum Error InitializeInterruptRegisterSetArray(struct Controller *xhc,
+                                               volatile struct InterrupterRegisterSetArrayWrapper 
+                                               *primary_interrupter)
 {
   primary_interrupter->array = (struct InterrupterRegisterSet*)
     (xhc->mmio_base + (xhc->cap->RTSOFF.bits.runtime_register_space_offset << 5) + 0x20);
   primary_interrupter->size = 1024;
+  return kSuccess;
 }
 
 enum Error InitializeCommandRing(struct Controller *xhc, size_t buf_size)
@@ -167,10 +174,11 @@ enum Error InitializeEventRing(struct Controller *xhc,
   return kSuccess;
 }
 
-void EnableInterruptForPrimaryInterrupter(struct InterrupterRegisterSet *primary_interrupter)
+enum Error EnableInterruptForPrimaryInterrupter(struct InterrupterRegisterSet *primary_interrupter)
 {
   primary_interrupter->IMAN.bits.interrupt_pending = true;
   primary_interrupter->IMAN.bits.interrupt_enable = true;
+  return kSuccess;
 }
 
 enum Error StartController(struct Controller *xhc)

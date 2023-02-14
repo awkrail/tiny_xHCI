@@ -26,17 +26,14 @@ struct Controller
 };
 
 // Controller-related functions
-void InitializeController(struct DeviceManager *dev_mgr,
+enum Error InitializeController(struct DeviceManager *dev_mgr,
                           struct Controller *xhc,
                           uintptr_t mmio_base);
-void PrintAllRegisters(struct Controller *xhc,
-                       struct Console *console);
-void SetCapAndOpRegisters(struct Controller *xhc);
-void ResetController(struct Controller *xhc);
-void SetMaxSlotEnabled(struct Controller* xhc);
-void SetDCBAAPRegister(struct Controller *xhc);
+enum Error SetCapAndOpRegisters(struct Controller *xhc);
+enum Error ResetController(struct Controller *xhc);
+enum Error SetMaxSlotEnabled(struct Controller* xhc);
+enum Error SetDCBAAPRegister(struct Controller *xhc);
 enum Error StartController(struct Controller *xhc);
-
 
 // Initialize Command ring
 enum Error InitializeCommandRing(struct Controller *xhc, size_t buf_size);
@@ -48,12 +45,16 @@ enum Error InitializeEventRing(struct Controller *xhc,
                                size_t buf_size);
 
 // Initialize Register Set Array
-void InitializeInterruptRegisterSetArray(struct Controller *xhc,
-                                         volatile struct InterrupterRegisterSetArrayWrapper
-                                          *primary_interrupter);
-void EnableInterruptForPrimaryInterrupter(struct InterrupterRegisterSet 
-                                          *primary_interrupter);
+enum Error InitializeInterruptRegisterSetArray(struct Controller *xhc,
+                                               volatile struct InterrupterRegisterSetArrayWrapper
+                                               *primary_interrupter);
+enum Error EnableInterruptForPrimaryInterrupter(struct InterrupterRegisterSet 
+                                                *primary_interrupter);
 
 // Register-related functions
 uint8_t ReadCAPLENGTH(volatile struct CapabilityRegisters *cap);
 uint16_t ReadHCIVERSION(volatile struct CapabilityRegisters *cap);
+
+// Debug
+void PrintAllRegisters(struct Controller *xhc,
+                       struct Console *console);
