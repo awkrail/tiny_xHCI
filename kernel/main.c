@@ -112,6 +112,11 @@ void KernelMain(const struct FrameBufferConfig *frame_buffer_config)
   for(int i = 1; i <= xhc.max_ports; ++i) {
     struct Port port = xHCIPortAt(&xhc, i);
     Log(kDebug, &console, "Port %d: IsConnected=%d\n", i, IsPortConnected(&port));
+    
+    if(IsPortConnected(&port)) {
+      err = xHCIConfigurePort(&xhc, &port);
+      Log(kDebug, &console, "Port configure errcode=%s\n", GetErrName(err));
+    }
   }
 
   /**
