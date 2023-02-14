@@ -2,8 +2,7 @@
 
 void InitializeController(struct DeviceManager *dev_mgr,
                           struct Controller *xhc,
-                          uintptr_t mmio_base,
-                          struct Console *console)
+                          uintptr_t mmio_base)
 {
   // Initialize device manager (e.g., DeviceContext)
   enum Error err = InitializeDevMgr(dev_mgr, kDeviceSize);
@@ -37,9 +36,6 @@ void InitializeController(struct DeviceManager *dev_mgr,
 
   // Run controller
   StartController(xhc);
-  //return err;
-  
-  Log(kDebug, console, "err: %s\n", GetErrName(err));
 }
 
 // for debug
@@ -177,9 +173,12 @@ void EnableInterruptForPrimaryInterrupter(struct InterrupterRegisterSet *primary
   primary_interrupter->IMAN.bits.interrupt_enable = true;
 }
 
-void StartController(struct Controller *xhc)
+enum Error StartController(struct Controller *xhc)
 {
   xhc->op->USBCMD.bits.interrupter_enable = true;
+  xhc->op->USBCMD.bits.run_stop = true;
+  while(xhc->op->USBSTS.bits.host_controller_halted);
+  return kSuccess;
 }
 
 uint8_t ReadCAPLENGTH(volatile struct CapabilityRegisters *cap)

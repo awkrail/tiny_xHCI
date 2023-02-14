@@ -72,9 +72,10 @@ void KernelMain(const struct FrameBufferConfig *frame_buffer_config)
                                    frame_buffer_config->vertical_resolution};
 
   InitConsole(&console, frame_buffer_config, &black, &white);
-  FillRectangle(frame_buffer_config, &ul_p, &lr_p, &gray);
+  FillRectangle(frame_buffer_config, &ul_p, &lr_p, &white);
   SetLogLevel(kWarn);
 
+  // search xHC devices
   printk("Running ScanAllBus...\n");
   enum Error err = ScanAllBus();
   printk("ScanAllBus: %s\n", GetErrName(err));
@@ -101,17 +102,13 @@ void KernelMain(const struct FrameBufferConfig *frame_buffer_config)
   // Load MMIO registers for xHCI device
   uint64_t xhc_bar;
   err = ReadBar(xhc_dev, &xhc_bar, 0);
-  Log(kDebug, &console, "ReadBar: %s\n", GetErrName(err));
-  Log(kDebug, &console, "xhc_bar: %08lx\n", xhc_bar);
   const uint64_t xhc_mmio_base = xhc_bar & ~(uint64_t)0xf;
-  Log(kDebug, &console, "xhc_mmio_base: %08lx\n", xhc_mmio_base);
 
-  // Initialize xHCI
-  // 1. Initialize controller
-  // 1.1 Load Capability / Operational Registers
+  // Initialize xHCI controller
   struct Controller xhc;
   struct DeviceManager dev_mgr;
   InitializeController(&dev_mgr, &xhc, 
                        xhc_mmio_base, &console);
+
   while (1) __asm__("hlt");
 }

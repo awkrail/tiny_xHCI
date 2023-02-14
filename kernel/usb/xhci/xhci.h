@@ -19,7 +19,6 @@ struct Controller
   uintptr_t mmio_base;
   volatile struct CapabilityRegisters *cap;
   volatile struct OperationalRegisters *op;
-
   volatile struct DeviceManager *dev_mgr;
   uint8_t max_ports;
   struct Ring cr;
@@ -29,15 +28,15 @@ struct Controller
 // Controller-related functions
 void InitializeController(struct DeviceManager *dev_mgr,
                           struct Controller *xhc,
-                          uintptr_t mmio_base,
-                          struct Console *console);
+                          uintptr_t mmio_base);
 void PrintAllRegisters(struct Controller *xhc,
                        struct Console *console);
 void SetCapAndOpRegisters(struct Controller *xhc);
 void ResetController(struct Controller *xhc);
 void SetMaxSlotEnabled(struct Controller* xhc);
 void SetDCBAAPRegister(struct Controller *xhc);
-void StartController(struct Controller *xhc);
+enum Error StartController(struct Controller *xhc);
+
 
 // Initialize Command ring
 enum Error InitializeCommandRing(struct Controller *xhc, size_t buf_size);
