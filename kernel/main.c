@@ -64,7 +64,6 @@ const struct PixelColor kDesktopFGColor = {255, 255, 255};
 void KernelMain(const struct FrameBufferConfig *frame_buffer_config) 
 {
   const struct PixelColor black = {0, 0, 0};
-  const struct PixelColor gray = {128, 128, 128};
   const struct PixelColor white = {255, 255, 255};
   
   const struct IntVector2D ul_p = {0, 0};
@@ -110,20 +109,12 @@ void KernelMain(const struct FrameBufferConfig *frame_buffer_config)
   err = InitializeController(&dev_mgr, &xhc, xhc_mmio_base);
   Log(kDebug, &console, "xHC Initialize: %s\n", GetErrName(err));
 
-  /**
   for(int i = 1; i <= xhc.max_ports; ++i) {
-    auto port = xHCIPortAt(i);
-    Log(kDebug, "Port: %d: IsConnected=%d\n", i, IsPortConnected(port));
-    if(IsPortConnected(port)) {
-      err = ConfigurePort(xhc, port);
-      if(err) {
-        Log(kError, "failed to configure port: %s at %s:%d\n",
-            GetErrName(err), GetFileName(err), GetLineName(err));
-        continue;
-      }
-    }
+    struct Port port = xHCIPortAt(&xhc, i);
+    Log(kDebug, &console, "Port %d: IsConnected=%d\n", i, IsPortConnected(&port));
   }
 
+  /**
   while (1) {
     err = ProcessEvent(xhc);
     if(err) {

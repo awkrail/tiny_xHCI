@@ -1,7 +1,7 @@
 TARGET = kernel.elf
 OBJS = main.o graphics.o font.o hankaku.o console.o newlib_support.o \
 			 pci.o error.o asmfunc.o logger.o usb/xhci/xhci.o usb/xhci/memory.o \
-			 usb/xhci/devmgr.o
+			 usb/xhci/devmgr.o usb/xhci/port.o
 
 CFLAGS += -I$(HOME)/tiny_xHCI/x86_64-elf/include \
 					-I$(HOME)/tiny_xHCI/x86_64-elf/freetype2 \

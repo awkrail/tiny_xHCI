@@ -1,5 +1,23 @@
 #include "xhci.h"
 
+enum PortConfigPhase {
+  kPortConfigPhaseNotConnected,
+  kPortConfigPhaseWaitingAddressed,
+  kPortConfigPhaseResetting,
+  kPortConfigPhaseEnablingSlot,
+  kPortConfigPhaseAddressingDevice,
+  kPortConfigPhaseInitializingDevice,
+  kPortConfigPhaseConfiguringEndpoints,
+  kPortConfigPhaseConfigured,
+};
+
+/** executing addressing ports
+ *  0 -> no ports
+ */
+volatile enum PortConfigPhase port_config_phase[256] = {0};
+uint8_t addressing_port = 0;
+
+
 enum Error InitializeController(struct DeviceManager *dev_mgr,
                                 struct Controller *xhc,
                                 uintptr_t mmio_base)
@@ -106,16 +124,6 @@ enum Error SetDCBAAPRegister(struct Controller *xhc)
   return kSuccess;
 }
 
-enum Error InitializeInterruptRegisterSetArray(struct Controller *xhc,
-                                               volatile struct InterrupterRegisterSetArrayWrapper 
-                                               *primary_interrupter)
-{
-  primary_interrupter->array = (struct InterrupterRegisterSet*)
-    (xhc->mmio_base + (xhc->cap->RTSOFF.bits.runtime_register_space_offset << 5) + 0x20);
-  primary_interrupter->size = 1024;
-  return kSuccess;
-}
-
 enum Error InitializeCommandRing(struct Controller *xhc, size_t buf_size)
 {
   if(xhc->cr.buf != NULL)
@@ -186,6 +194,57 @@ enum Error StartController(struct Controller *xhc)
   xhc->op->USBCMD.bits.interrupter_enable = true;
   xhc->op->USBCMD.bits.run_stop = true;
   while(xhc->op->USBSTS.bits.host_controller_halted);
+  return kSuccess;
+}
+
+struct Port xHCIPortAt(struct Controller *xhc,
+                       uint8_t port_num)
+{
+  struct Port port;
+  struct PortRegisterSet *array = (struct PortRegisterSet*)((uintptr_t)xhc->op + 0x400u);
+  
+  port.port_num = port_num;
+  port.port_reg_set = &array[port_num-1];
+  return port;
+}
+
+enum Error xHCIConfigurePort(struct Controller *xhc, struct Port *port)
+{
+  if(port_config_phase[port->port_num] == kPortConfigPhaseNotConnected) {
+    return xHCIResetPort(xhc, port);
+  }
+  return kSuccess;
+}
+
+enum Error xHCIResetPort(struct Controller *xhc, struct Port *port)
+{
+  bool is_connected = IsPortConnected(port);
+  if(!is_connected) {
+    return kSuccess;
+  }
+
+  if(addressing_port != 0) {
+    port_config_phase[port->port_num] = kPortConfigPhaseWaitingAddressed;
+  } else {
+    enum PortConfigPhase port_phase = port_config_phase[port->port_num];
+    if(port_phase != kPortConfigPhaseNotConnected &&
+       port_phase != kPortConfigPhaseWaitingAddressed)
+      return kInvalidPhase;
+
+    addressing_port = port->port_num;
+    port_config_phase[port->port_num] = kPortConfigPhaseResetting;
+    ResetPort(port);
+  }
+  return kSuccess;  
+}
+
+enum Error InitializeInterruptRegisterSetArray(struct Controller *xhc,
+                                               volatile struct InterrupterRegisterSetArrayWrapper 
+                                               *primary_interrupter)
+{
+  primary_interrupter->array = (struct InterrupterRegisterSet*)
+    (xhc->mmio_base + (xhc->cap->RTSOFF.bits.runtime_register_space_offset << 5) + 0x20);
+  primary_interrupter->size = 1024;
   return kSuccess;
 }
 

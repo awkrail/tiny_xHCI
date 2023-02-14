@@ -11,6 +11,7 @@
 #include "registers.h"
 #include "ring.h"
 #include "trb.h"
+#include "port.h"
 
 #define kDeviceSize 8
 
@@ -25,6 +26,9 @@ struct Controller
   struct EventRing er;
 };
 
+/**
+ * Initialize xHC host controller
+**/
 // Controller-related functions
 enum Error InitializeController(struct DeviceManager *dev_mgr,
                           struct Controller *xhc,
@@ -43,13 +47,24 @@ enum Error RegisterCommandRing(struct Controller *xhc);
 enum Error InitializeEventRing(struct Controller *xhc,
                                struct InterrupterRegisterSet *interrupter,
                                size_t buf_size);
+enum Error EnableInterruptForPrimaryInterrupter(struct InterrupterRegisterSet 
+                                                *primary_interrupter);
 
 // Initialize Register Set Array
 enum Error InitializeInterruptRegisterSetArray(struct Controller *xhc,
                                                volatile struct InterrupterRegisterSetArrayWrapper
                                                *primary_interrupter);
-enum Error EnableInterruptForPrimaryInterrupter(struct InterrupterRegisterSet 
-                                                *primary_interrupter);
+
+/**
+ * Initiealize Port and detect devices
+**/
+struct Port xHCIPortAt(struct Controller *xhc,
+                       uint8_t port_num);
+enum Error xHCIConfigurePort(struct Controller *xhc,
+                             struct Port *port);
+enum Error xHCIResetPort(struct Controller *xhc,
+                         struct Port *port);
+
 
 // Register-related functions
 uint8_t ReadCAPLENGTH(volatile struct CapabilityRegisters *cap);
