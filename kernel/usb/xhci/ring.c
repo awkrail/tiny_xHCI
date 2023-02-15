@@ -2,7 +2,7 @@
 
 union TRB* ReadDequeuePointer(struct EventRing *event_ring)
 {
-  return (union TRB*)(interrupter->ERDP.bits.event_ring_dequeue_pointer << 4);
+  return (union TRB*)(event_ring->interrupter->ERDP.bits.event_ring_dequeue_pointer << 4);
 }
 
 union TRB* EventRingFront(struct EventRing *event_ring)

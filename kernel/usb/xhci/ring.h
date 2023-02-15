@@ -37,8 +37,8 @@ struct EventRing
   struct InterrupterRegisterSet *interrupter;
 };
 
-struct TRB* ReadDequeuePointer(struct EventRing *event_ring);
-struct TRB* EventRingFront(struct EventRing *event_ring);
+union TRB* ReadDequeuePointer(struct EventRing *event_ring);
+union TRB* EventRingFront(struct EventRing *event_ring);
 bool HasEventRingFront(struct EventRing *event_ring);
 
 // void WriteDequeuePointer(struct TRB* p);

@@ -242,6 +242,6 @@ union CommandCompletionEventTRB
 };
 
 // dynamic cast from event_trb to other types
-union TransferEventTRB* CastTRBtoTransferEventTRB(struct TRB* event_trb);
-union PortStatusChangeEventTRB* CastTRBToPortStatusChangeEventTRB(struct TRB* event_trb);
-union CommandCompletionEventTRB* CastTRBToCommandCompletionEventTRB(struct TRB* event_trb);
+union TransferEventTRB* CastTRBtoTransferEventTRB(union TRB* event_trb);
+union PortStatusChangeEventTRB* CastTRBToPortStatusChangeEventTRB(union TRB* event_trb);
+union CommandCompletionEventTRB* CastTRBToCommandCompletionEventTRB(union TRB* event_trb);

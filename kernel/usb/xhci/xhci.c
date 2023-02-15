@@ -204,7 +204,7 @@ struct Port xHCIPortAt(struct Controller *xhc,
   struct PortRegisterSet *array = (struct PortRegisterSet*)((uintptr_t)xhc->op + 0x400u);
   
   port.port_num = port_num;
-  port.port_reg_set = &array[port_num-1];
+  port.port_reg_set = &array[port_num-1]; // local ptr will be free?
   return port;
 }
 
@@ -219,6 +219,7 @@ enum Error xHCIConfigurePort(struct Controller *xhc, struct Port *port)
 enum Error xHCIResetPort(struct Controller *xhc, struct Port *port)
 {
   bool is_connected = IsPortConnected(port);
+
   if(!is_connected) {
     return kSuccess;
   }
@@ -245,7 +246,7 @@ enum Error xHCIProcessEvent(struct Controller *xhc)
     return kSuccess;
   }
 
-  enum err = kNotImplemented;
+  enum Error err = kNotImplemented;
   union TRB *event_trb = EventRingFront(&xhc->er);
 
   /**

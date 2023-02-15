@@ -114,20 +114,21 @@ void KernelMain(const struct FrameBufferConfig *frame_buffer_config)
     Log(kDebug, &console, "Port %d: IsConnected=%d\n", i, IsPortConnected(&port));
     
     if(IsPortConnected(&port)) {
+      Log(kDebug, &console, "before: port_PORTSC=%08x\n", port.port_reg_set->PORTSC.data);
       err = xHCIConfigurePort(&xhc, &port);
-      Log(kDebug, &console, "Port configure errcode=%s\n", GetErrName(err));
+      Log(kDebug, &console, "after: port_PORTSC=%08x\n", port.port_reg_set->PORTSC.data);
     }
   }
 
+  /**
   while (1) {
-    err = xHCIProcessEvent(xhc);
-    /**
+    err = xHCIProcessEvent(&xhc);
     if(err) {
       Log(kError, "Error while ProcessEvent: %s at %s:%d\n",
           GetErrName(err), GetFileName(err), GetLineName(err));
     }
-    **/
   }
+  **/
 
   while (1) __asm__("hlt");
 }

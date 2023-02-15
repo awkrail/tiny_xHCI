@@ -2,6 +2,7 @@
 
 #include <stdint.h>
 #include "stdbool.h"
+#include "../../logger.h"
 #include "../../error.h"
 #include "registers.h"
 
