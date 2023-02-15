@@ -119,15 +119,13 @@ void KernelMain(const struct FrameBufferConfig *frame_buffer_config)
     }
   }
 
-  /**
   while (1) {
-    err = ProcessEvent(xhc);
+    err = xHCIProcessEvent(xhc);
     if(err) {
       Log(kError, "Error while ProcessEvent: %s at %s:%d\n",
           GetErrName(err), GetFileName(err), GetLineName(err));
     }
   }
-  **/
 
   while (1) __asm__("hlt");
 }

@@ -16,3 +16,11 @@ union TRB
     uint32_t control: 16;
   } __attribute__((packed)) bits;
 };
+
+// TODO: Implement TRB structures
+
+
+// dynamic cast from event_trb to other types
+CastTRBtoTransferEventTRB(struct TRB* event_trb);
+CastTRBToPortStatusChangeEventTRB(struct TRB* event_trb);
+CastTRBToCommandCompletionEventTRB(struct TRB* event_trb);
