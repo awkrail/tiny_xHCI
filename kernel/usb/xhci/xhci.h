@@ -65,6 +65,11 @@ enum Error xHCIConfigurePort(struct Controller *xhc,
 enum Error xHCIResetPort(struct Controller *xhc,
                          struct Port *port);
 
+/**
+ * Process Events
+**/
+enum Error xHCIProcessEvent(struct Controller *xhc);
+
 
 // Register-related functions
 uint8_t ReadCAPLENGTH(volatile struct CapabilityRegisters *cap);

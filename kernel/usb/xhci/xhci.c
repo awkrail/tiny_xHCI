@@ -227,6 +227,7 @@ enum Error xHCIResetPort(struct Controller *xhc, struct Port *port)
     port_config_phase[port->port_num] = kPortConfigPhaseWaitingAddressed;
   } else {
     enum PortConfigPhase port_phase = port_config_phase[port->port_num];
+
     if(port_phase != kPortConfigPhaseNotConnected &&
        port_phase != kPortConfigPhaseWaitingAddressed)
       return kInvalidPhase;
@@ -236,6 +237,11 @@ enum Error xHCIResetPort(struct Controller *xhc, struct Port *port)
     ResetPort(port);
   }
   return kSuccess;  
+}
+
+enum Error xHCIProcessEvent(struct Controller *xhc)
+{
+  //if(!xhc)
 }
 
 enum Error InitializeInterruptRegisterSetArray(struct Controller *xhc,
