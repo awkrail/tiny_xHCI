@@ -13,7 +13,7 @@ enum PortConfigPhase {
 
 /** executing addressing ports
  *  0 -> no ports
- */
+*/
 volatile enum PortConfigPhase port_config_phase[256] = {0};
 uint8_t addressing_port = 0;
 
@@ -246,17 +246,19 @@ enum Error xHCIProcessEvent(struct Controller *xhc)
   }
 
   enum err = kNotImplemented;
-  struct TRB *event_trb = EventRingFront(&xhc->er);
+  union TRB *event_trb = EventRingFront(&xhc->er);
 
-  if(struct TransferEventTRB* trb = CastTRBtoTransferEventTRB(event_trb)) {
+  /**
+  if(union TransferEventTRB* trb = CastTRBtoTransferEventTRB(event_trb)) {
     err = OnEvent(xhc, *trb);
-  } else if (struct PortStatusChangeEventTRB* trb = CastTRBToPortStatusChangeEventTRB(event_trb)) {
+  } else if (union PortStatusChangeEventTRB* trb = CastTRBToPortStatusChangeEventTRB(event_trb)) {
     err = OnEvent(xhc, *trb);
-  } else if (struct CommandCompletionEventTRB* trb = CastTRBToCommandCompletionEventTRB(event_trb)) {
+  } else if (union CommandCompletionEventTRB* trb = CastTRBToCommandCompletionEventTRB(event_trb)) {
     err = OnEvent(xhc, *trb);
   }
-
   Pop(&xhc->er);
+  **/
+
   return err;
 }
 
