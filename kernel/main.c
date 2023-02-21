@@ -111,16 +111,13 @@ void KernelMain(const struct FrameBufferConfig *frame_buffer_config)
 
   for(int i = 1; i <= xhc.max_ports; ++i) {
     struct Port port = xHCIPortAt(&xhc, i);
+    size_t port_num = port.port_num;
     Log(kDebug, &console, "Port %d: IsConnected=%d\n", i, IsPortConnected(&port));
-    
     if(IsPortConnected(&port)) {
-      Log(kDebug, &console, "before: port_PORTSC=%08x\n", port.port_reg_set->PORTSC.data);
       err = xHCIConfigurePort(&xhc, &port);
-      Log(kDebug, &console, "after: port_PORTSC=%08x\n", port.port_reg_set->PORTSC.data);
     }
   }
 
-  /**
   while (1) {
     err = xHCIProcessEvent(&xhc);
     if(err) {
@@ -128,7 +125,6 @@ void KernelMain(const struct FrameBufferConfig *frame_buffer_config)
           GetErrName(err), GetFileName(err), GetLineName(err));
     }
   }
-  **/
 
   while (1) __asm__("hlt");
 }

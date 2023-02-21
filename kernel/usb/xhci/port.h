@@ -9,7 +9,7 @@
 struct Port
 {
   uint8_t port_num;
-  struct PortRegisterSet *port_reg_set;
+  struct PortRegisterSet port_reg_set;
 };
 
 bool IsPortConnected(struct Port *port);

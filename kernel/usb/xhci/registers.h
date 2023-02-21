@@ -372,3 +372,8 @@ struct InterrupterRegisterSetArrayWrapper
   size_t size;
 };
 
+struct PortRegisterSetArrayWrapper
+{
+  struct PortRegisterSet *array;
+  size_t size;
+};

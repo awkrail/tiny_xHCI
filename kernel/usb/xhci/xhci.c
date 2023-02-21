@@ -15,7 +15,7 @@ enum PortConfigPhase {
  *  0 -> no ports
 */
 volatile enum PortConfigPhase port_config_phase[256] = {0};
-uint8_t addressing_port = 0;
+volatile uint8_t addressing_port = 0;
 
 
 enum Error InitializeController(struct DeviceManager *dev_mgr,
@@ -200,11 +200,13 @@ enum Error StartController(struct Controller *xhc)
 struct Port xHCIPortAt(struct Controller *xhc,
                        uint8_t port_num)
 {
-  struct Port port;
-  struct PortRegisterSet *array = (struct PortRegisterSet*)((uintptr_t)xhc->op + 0x400u);
+  volatile struct PortRegisterSetArrayWrapper port_reg;
+  port_reg.array = (struct PortRegisterSet*)((uintptr_t)xhc->op + 0x400u);
+  port_reg.size = xhc->max_ports;
   
+  struct Port port;
   port.port_num = port_num;
-  port.port_reg_set = &array[port_num-1]; // local ptr will be free?
+  port.port_reg_set = port_reg.array[port_num-1];
   return port;
 }
 
@@ -242,25 +244,7 @@ enum Error xHCIResetPort(struct Controller *xhc, struct Port *port)
 
 enum Error xHCIProcessEvent(struct Controller *xhc)
 {
-  if(!HasEventRingFront(EventRingFront(&xhc->er))) {
-    return kSuccess;
-  }
-
-  enum Error err = kNotImplemented;
-  union TRB *event_trb = EventRingFront(&xhc->er);
-
-  /**
-  if(union TransferEventTRB* trb = CastTRBtoTransferEventTRB(event_trb)) {
-    err = OnEvent(xhc, *trb);
-  } else if (union PortStatusChangeEventTRB* trb = CastTRBToPortStatusChangeEventTRB(event_trb)) {
-    err = OnEvent(xhc, *trb);
-  } else if (union CommandCompletionEventTRB* trb = CastTRBToCommandCompletionEventTRB(event_trb)) {
-    err = OnEvent(xhc, *trb);
-  }
-  Pop(&xhc->er);
-  **/
-
-  return err;
+  return kSuccess;
 }
 
 enum Error InitializeInterruptRegisterSetArray(struct Controller *xhc,
