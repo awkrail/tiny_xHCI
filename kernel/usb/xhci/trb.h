@@ -1,6 +1,24 @@
 #pragma once
 
 #include <stdint.h>
+#include <stddef.h>
+
+enum TRBType {
+  kNormalTRBType = 1,
+  kSetupStageTRBType = 2,
+  kDataStageTRBType = 3,
+  kStatusStageTRBType = 4,
+  kLinkTRBType = 6,
+  kNoOpTRBType = 8,
+  kEnableSlotCommandTRBType = 9,
+  kAddressDeviceCommandTRBType = 11,
+  kConfigureEndpointCommandTRBType = 12,
+  kStopEndpointCommandTRBType = 15,
+  kNoOpCommandTRBType = 23,
+  kTransferEventTRBType = 32,
+  kCommandCompletionEventTRBType = 33,
+  kPortStatusChangeEventTRBType = 34,
+};
 
 union TRB
 {
@@ -19,7 +37,6 @@ union TRB
 
 union NormalTRB
 {
-  unsigned int Type;
   uint32_t data[4];
   struct
   {
@@ -45,7 +62,6 @@ union NormalTRB
 
 union SetupStageTRB
 {
-  unsigned int Type;
   uint32_t data[4];
   struct 
   {
@@ -66,7 +82,6 @@ union SetupStageTRB
 
 union LinkTRB
 {
-  unsigned int Type;
   uint32_t data[4];
   struct
   {
@@ -89,7 +104,6 @@ union LinkTRB
 
 union NoOpTRB
 {
-  unsigned int Type;
   uint32_t data[4];
   struct
   {
@@ -109,7 +123,6 @@ union NoOpTRB
 
 union EnableSlotCommandTRB
 {
-  unsigned int Type;
   uint32_t data[4];
   struct
   {
@@ -127,7 +140,6 @@ union EnableSlotCommandTRB
 
 union AddressDeviceCommandTRB
 {
-  unsigned int Type;
   uint32_t data[4];
   struct
   {
@@ -147,7 +159,6 @@ union AddressDeviceCommandTRB
 
 union ConfigureEndpointCommandTRB
 {
-  unsigned int Type;
   uint32_t data[4];
   struct
   {
@@ -166,7 +177,6 @@ union ConfigureEndpointCommandTRB
 
 union StopEndpointCommandTRB
 {
-  unsigned int Type;
   uint32_t data[4];
   struct
   {
@@ -186,7 +196,6 @@ union StopEndpointCommandTRB
 
 union NoOpCommandTRB
 {
-  unsigned int Type;
   uint32_t data[4];
   struct
   {
@@ -203,7 +212,6 @@ union NoOpCommandTRB
 
 union TransferEventTRB
 {
-  unsigned int Type;
   uint32_t data[4];
   struct
   {
@@ -225,7 +233,6 @@ union TransferEventTRB
 
 union CommandCompletionEventTRB
 {
-  unsigned int Type;
   uint32_t data[4];
   struct
   {
@@ -242,6 +249,6 @@ union CommandCompletionEventTRB
 };
 
 // dynamic cast from event_trb to other types
-union TransferEventTRB* CastTRBtoTransferEventTRB(union TRB* event_trb);
-union PortStatusChangeEventTRB* CastTRBToPortStatusChangeEventTRB(union TRB* event_trb);
-union CommandCompletionEventTRB* CastTRBToCommandCompletionEventTRB(union TRB* event_trb);
+union TransferEventTRB* CastTRBtoTransferEventTRB(union TRB* trb);
+union PortStatusChangeEventTRB* CastTRBToPortStatusChangeEventTRB(union TRB* trb);
+union CommandCompletionEventTRB* CastTRBToCommandCompletionEventTRB(union TRB* trb);

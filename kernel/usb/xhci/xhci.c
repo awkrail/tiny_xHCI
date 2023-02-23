@@ -244,6 +244,22 @@ enum Error xHCIResetPort(struct Controller *xhc, struct Port *port)
 
 enum Error xHCIProcessEvent(struct Controller *xhc)
 {
+  if(HasEventRingFront(&xhc->er))
+    return kSuccess;
+
+  //enum Error err = kNotImplemented;
+  union TRB *event_trb = EventRingFront(&xhc->er);
+  void* trb;
+
+  if((trb = CastTRBtoTransferEventTRB(event_trb)) != NULL) {
+    //err = OnEvent(xhc, *trb);
+  } else if ((trb = CastTRBToPortStatusChangeEventTRB(event_trb)) != NULL) {
+    //err = OnEvent(xhc, *trb);
+  } else if ((trb = CastTRBToCommandCompletionEventTRB(event_trb)) != NULL) {
+    //err = OnEvent(xhc, *trb);
+  }
+  //Pop(&xhc->er);
+
   return kSuccess;
 }
 

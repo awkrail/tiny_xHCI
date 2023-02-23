@@ -14,3 +14,7 @@ bool HasEventRingFront(struct EventRing *event_ring)
 {
   return EventRingFront(event_ring)->bits.cycle_bit == event_ring->cycle_bit;
 }
+
+void Pop(struct EventRing *event_ring)
+{
+}

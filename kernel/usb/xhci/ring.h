@@ -41,5 +41,4 @@ union TRB* ReadDequeuePointer(struct EventRing *event_ring);
 union TRB* EventRingFront(struct EventRing *event_ring);
 bool HasEventRingFront(struct EventRing *event_ring);
 
-// void WriteDequeuePointer(struct TRB* p);
-// void Pop();
+void Pop(struct EventRing *event_ring);
