@@ -206,7 +206,7 @@ struct Port xHCIPortAt(struct Controller *xhc,
   
   struct Port port;
   port.port_num = port_num;
-  port.port_reg_set = port_reg.array[port_num-1];
+  port.port_reg_set = &port_reg.array[port_num-1];
   return port;
 }
 
