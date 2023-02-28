@@ -75,6 +75,9 @@ enum Error xHCIProcessEvent(struct Controller *xhc);
 uint8_t ReadCAPLENGTH(volatile struct CapabilityRegisters *cap);
 uint16_t ReadHCIVERSION(volatile struct CapabilityRegisters *cap);
 
+// Event ring functions
+void WriteDequeuePointer(union TRB *p, struct InterrupterRegisterSet *interrupter);
+
 // Debug
 void PrintAllRegisters(struct Controller *xhc,
                        struct Console *console);

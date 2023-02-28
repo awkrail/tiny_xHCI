@@ -178,9 +178,17 @@ enum Error InitializeEventRing(struct Controller *xhc,
   xhc->er.erst[0].bits.ring_segment_size = buf_size;
 
   interrupter->ERSTSZ.bits.event_ring_segment_table_size = 1;
+  WriteDequeuePointer(&xhc->er.buf[0], interrupter);
   interrupter->ERSTBA.bits.event_ring_segment_table_base_address = ((uint64_t)xhc->er.erst) >> 6;
   return kSuccess;
 }
+
+void WriteDequeuePointer(union TRB *p, struct InterrupterRegisterSet *interrupter)
+{
+  uint64_t val = (uint64_t)p;
+  interrupter->ERDP.bits.event_ring_dequeue_pointer = val >> 4;
+}
+
 
 enum Error EnableInterruptForPrimaryInterrupter(struct InterrupterRegisterSet *primary_interrupter)
 {
@@ -244,7 +252,7 @@ enum Error xHCIResetPort(struct Controller *xhc, struct Port *port)
 
 enum Error xHCIProcessEvent(struct Controller *xhc)
 {
-  if(HasEventRingFront(&xhc->er))
+  if(!HasEventRingFront(&xhc->er))
     return kSuccess;
 
   //enum Error err = kNotImplemented;
