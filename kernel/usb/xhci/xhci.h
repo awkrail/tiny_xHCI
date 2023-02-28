@@ -64,10 +64,15 @@ enum Error xHCIConfigurePort(struct Controller *xhc,
                              struct Port *port);
 enum Error xHCIResetPort(struct Controller *xhc,
                          struct Port *port);
+enum Error xHCIEnableSlot(struct Controller *xhc,
+                          struct Port *port);
 
 /**
  * Process Events
 **/
+enum Error OnPortStatusChangeEvent(struct Controller *xhc,
+                                   union PortStatusChangeEventTRB *trb);
+
 enum Error xHCIProcessEvent(struct Controller *xhc);
 
 

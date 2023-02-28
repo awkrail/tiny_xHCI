@@ -3,7 +3,7 @@
 enum PortConfigPhase {
   kPortConfigPhaseNotConnected,
   kPortConfigPhaseWaitingAddressed,
-  kPortConfigPhaseResetting,
+  kPortConfigPhaseResettingPort,
   kPortConfigPhaseEnablingSlot,
   kPortConfigPhaseAddressingDevice,
   kPortConfigPhaseInitializingDevice,
@@ -244,10 +244,43 @@ enum Error xHCIResetPort(struct Controller *xhc, struct Port *port)
       return kInvalidPhase;
 
     addressing_port = port->port_num;
-    port_config_phase[port->port_num] = kPortConfigPhaseResetting;
+    port_config_phase[port->port_num] = kPortConfigPhaseResettingPort;
     ResetPort(port);
   }
   return kSuccess;  
+}
+
+enum Error xHCIEnableSlot(struct Controller *xhc, struct Port *port)
+{
+  bool is_connected = IsPortConnected(port);
+  bool reset_completed = IsPortResetChanged(port);
+  /**
+  if(is_enabled && reset_completed) {
+    ClearPortResetChange(port);
+    port_config_phase[port->port_num] = kPortConfigPhaseEnablingSlot;
+    EnableSlotCommandTRB cmd;
+    PushCommandRing(xhc, cmd);
+    DoorbellRegisterAt(xhc, 0);
+    Ring(0);
+  }
+  **/
+  return kSuccess;
+}
+
+
+enum Error OnPortStatusChangeEvent(struct Controller *xhc, union PortStatusChangeEventTRB *trb)
+{
+  uint32_t port_id = trb->bits.port_id;
+  struct Port port = xHCIPortAt(xhc, port_id);
+
+  switch(port_config_phase[port_id]) {
+    case kPortConfigPhaseNotConnected:
+      return xHCIResetPort(xhc, &port);
+    case kPortConfigPhaseResettingPort:
+      return xHCIEnableSlot(xhc, &port);
+    default:
+      return kInvalidPhase;
+  }
 }
 
 enum Error xHCIProcessEvent(struct Controller *xhc)
@@ -255,16 +288,23 @@ enum Error xHCIProcessEvent(struct Controller *xhc)
   if(!HasEventRingFront(&xhc->er))
     return kSuccess;
 
-  //enum Error err = kNotImplemented;
+  enum Error err = kNotImplemented;
   union TRB *event_trb = EventRingFront(&xhc->er);
   void* trb;
 
+  union TransferEventTRB *transfer_event_trb = NULL;
+  union PortStatusChangeEventTRB *port_status_change_event_trb = NULL;
+  union CommandCompletionEventTRB *command_completion_event_trb = NULL;
+
   if((trb = CastTRBtoTransferEventTRB(event_trb)) != NULL) {
-    //err = OnEvent(xhc, *trb);
+    transfer_event_trb = (union TransferEventTRB*)trb;
+    //err = OnTransferEvent(xhc, *trb);
   } else if ((trb = CastTRBToPortStatusChangeEventTRB(event_trb)) != NULL) {
-    //err = OnEvent(xhc, *trb);
+    port_status_change_event_trb = (union PortStatusChangeEventTRB*)trb;
+    err = OnPortStatusChangeEvent(xhc, port_status_change_event_trb);
   } else if ((trb = CastTRBToCommandCompletionEventTRB(event_trb)) != NULL) {
-    //err = OnEvent(xhc, *trb);
+    command_completion_event_trb = (union CommandCompletionEventTRB*)trb;
+    //err = OnCommandCompletionEvent(xhc, *trb);
   }
   //Pop(&xhc->er);
 

@@ -231,6 +231,24 @@ union TransferEventTRB
   } __attribute__((packed)) bits;
 };
 
+union PortStatusChangeEventTRB
+{
+  uint32_t data[4];
+  struct
+  {
+    uint32_t : 24;
+    uint32_t port_id: 8;
+
+    uint32_t : 32;
+    uint32_t : 24;
+    uint32_t completion_code: 8;
+
+    uint32_t cycle_bit: 1;
+    uint32_t : 9;
+    uint32_t trb_type: 6;
+  } __attribute__((packed)) bits;
+};
+
 union CommandCompletionEventTRB
 {
   uint32_t data[4];
