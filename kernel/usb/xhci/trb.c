@@ -23,3 +23,22 @@ union CommandCompletionEventTRB* CastTRBToCommandCompletionEventTRB(union TRB* t
   }
   return NULL;
 }
+
+union EnableSlotCommandTRB InitializeEnableSlotCommandTRB()
+{
+  union EnableSlotCommandTRB cmd;
+  for(int i=0; i<4; ++i) {
+    cmd.data[i] = 0x00000000;
+  }
+  return cmd;
+}
+
+union LinkTRB InitializeLinkTRB(union TRB* ring_segment_pointer)
+{
+  union LinkTRB link;
+  for(int i=0; i<4; ++i) {
+    link.data[i] = 0x00000000;
+  }
+  link.bits.ring_segment_pointer = (uint64_t)ring_segment_pointer >> 4;
+  return link;
+}

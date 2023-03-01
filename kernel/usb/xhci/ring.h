@@ -41,4 +41,10 @@ union TRB* ReadDequeuePointer(struct EventRing *event_ring);
 union TRB* EventRingFront(struct EventRing *event_ring);
 bool HasEventRingFront(struct EventRing *event_ring);
 
+// Command ring functions
+void CopyToLast(struct Ring *command_ring, uint32_t data[4]);
+union TRB* PushCommandRing(struct Ring *command_ring, uint32_t data[4]);
+
+
+
 void Pop(struct EventRing *event_ring);

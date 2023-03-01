@@ -270,3 +270,7 @@ union CommandCompletionEventTRB
 union TransferEventTRB* CastTRBtoTransferEventTRB(union TRB* trb);
 union PortStatusChangeEventTRB* CastTRBToPortStatusChangeEventTRB(union TRB* trb);
 union CommandCompletionEventTRB* CastTRBToCommandCompletionEventTRB(union TRB* trb);
+
+// Initializer
+union EnableSlotCommandTRB InitializeEnableSlotCommandTRB();
+union LinkTRB InitializeLinkTRB(union TRB* ring_segment_pointer);

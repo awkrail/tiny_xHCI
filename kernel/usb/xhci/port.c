@@ -32,3 +32,15 @@ enum Error ResetPort(struct Port *port)
   while(port->port_reg_set->PORTSC.bits.port_reset);
   return kSuccess;
 }
+
+void ClearConnectStatusChanged(struct Port *port)
+{
+  port->port_reg_set->PORTSC.data &= 0x0e01c3e0u;
+  port->port_reg_set->PORTSC.bits.connect_status_change = 1;
+}
+
+void ClearPortResetChange(struct Port *port)
+{
+  port->port_reg_set->PORTSC.data &= 0x0e01c3e0u;
+  port->port_reg_set->PORTSC.bits.port_reset_change = 1;
+}

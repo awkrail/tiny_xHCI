@@ -254,16 +254,14 @@ enum Error xHCIEnableSlot(struct Controller *xhc, struct Port *port)
 {
   bool is_connected = IsPortConnected(port);
   bool reset_completed = IsPortResetChanged(port);
-  /**
-  if(is_enabled && reset_completed) {
+  if(is_connected && reset_completed) {
     ClearPortResetChange(port);
     port_config_phase[port->port_num] = kPortConfigPhaseEnablingSlot;
-    EnableSlotCommandTRB cmd;
-    PushCommandRing(xhc, cmd);
-    DoorbellRegisterAt(xhc, 0);
-    Ring(0);
+    union EnableSlotCommandTRB cmd = InitializeEnableSlotCommandTRB();
+    PushCommandRing(&xhc->cr, cmd.data);
+    //DoorbellRegisterAt(xhc, 0);
+    //Ring(0);
   }
-  **/
   return kSuccess;
 }
 

@@ -19,3 +19,6 @@ bool IsPortResetChanged(struct Port *port);
 
 int PortSpeed(struct Port *port);
 enum Error ResetPort(struct Port *port);
+
+void ClearConnectStatusChanged(struct Port *port);
+void ClearPortResetChange(struct Port *port);
