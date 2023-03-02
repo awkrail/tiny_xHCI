@@ -58,7 +58,7 @@ InitializePortRegisterSetArray(struct Controller *xhc);
 struct DoorbellRegisterSetArrayWrapper
 InitializeDoorbellRegisterSetArray(struct Controller *xhc);
 
-
+union Doorbell_Bitmap* DoorbellRegisterAt(struct Controller *xhc, size_t index);
 
 /**
  * Initiealize Port and detect devices

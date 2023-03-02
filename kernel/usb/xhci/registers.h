@@ -380,6 +380,6 @@ struct PortRegisterSetArrayWrapper
 
 struct DoorbellRegisterSetArrayWrapper
 {
-  struct DoorbellRegister *array;
+  union Doorbell_Bitmap *array;
   size_t size;
 };

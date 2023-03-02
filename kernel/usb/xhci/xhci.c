@@ -258,10 +258,18 @@ enum Error xHCIEnableSlot(struct Controller *xhc, struct Port *port)
     port_config_phase[port->port_num] = kPortConfigPhaseEnablingSlot;
     union EnableSlotCommandTRB cmd = InitializeEnableSlotCommandTRB();
     PushCommandRing(&xhc->cr, cmd.data);
-    //union Doorbell_Bitmap doorbell = DoorbellRegisterAt(xhc, 0);
-    //DoorbellRing(doorbell, 0, 0);
+    union Doorbell_Bitmap* doorbell = DoorbellRegisterAt(xhc, 0);
+    doorbell->bits.db_target = 0;
+    doorbell->bits.db_stream_id = 0;
   }
   return kSuccess;
+}
+
+union Doorbell_Bitmap* DoorbellRegisterAt(struct Controller *xhc, size_t index)
+{
+  struct DoorbellRegisterSetArrayWrapper doorbell 
+    = InitializeDoorbellRegisterSetArray(xhc);
+  return &doorbell.array[index];
 }
 
 
@@ -329,7 +337,12 @@ InitializePortRegisterSetArray(struct Controller *xhc)
 
 struct DoorbellRegisterSetArrayWrapper
 InitializeDoorbellRegisterSetArray(struct Controller *xhc)
-{}
+{
+  struct DoorbellRegisterSetArrayWrapper doorbell;
+  doorbell.array = (union Doorbell_Bitmap*)(xhc->mmio_base + (xhc->cap->DBOFF.bits.doorbell_array_offset << 2));
+  doorbell.size = 256;
+  return doorbell;
+}
 
 uint8_t ReadCAPLENGTH(volatile struct CapabilityRegisters *cap)
 {
