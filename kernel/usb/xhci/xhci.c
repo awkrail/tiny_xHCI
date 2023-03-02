@@ -44,8 +44,9 @@ enum Error InitializeController(struct DeviceManager *dev_mgr,
   err = RegisterCommandRing(xhc);
 
   // Event Ring configuration
-  volatile struct InterrupterRegisterSetArrayWrapper primary_interrupter;
-  err = InitializeInterruptRegisterSetArray(xhc, &primary_interrupter);
+  //volatile struct InterrupterRegisterSetArrayWrapper primary_interrupter;
+  struct InterrupterRegisterSetArrayWrapper primary_interrupter 
+    = InitializeInterruptRegisterSetArray(xhc);
 
   err = InitializeEventRing(xhc, primary_interrupter.array, 32);
 
@@ -208,9 +209,7 @@ enum Error StartController(struct Controller *xhc)
 struct Port xHCIPortAt(struct Controller *xhc,
                        uint8_t port_num)
 {
-  volatile struct PortRegisterSetArrayWrapper port_reg;
-  port_reg.array = (struct PortRegisterSet*)((uintptr_t)xhc->op + 0x400u);
-  port_reg.size = xhc->max_ports;
+  struct PortRegisterSetArrayWrapper port_reg = InitializePortRegisterSetArray(xhc);
   
   struct Port port;
   port.port_num = port_num;
@@ -259,8 +258,8 @@ enum Error xHCIEnableSlot(struct Controller *xhc, struct Port *port)
     port_config_phase[port->port_num] = kPortConfigPhaseEnablingSlot;
     union EnableSlotCommandTRB cmd = InitializeEnableSlotCommandTRB();
     PushCommandRing(&xhc->cr, cmd.data);
-    //DoorbellRegisterAt(xhc, 0);
-    //Ring(0);
+    //union Doorbell_Bitmap doorbell = DoorbellRegisterAt(xhc, 0);
+    //DoorbellRing(doorbell, 0, 0);
   }
   return kSuccess;
 }
@@ -309,15 +308,28 @@ enum Error xHCIProcessEvent(struct Controller *xhc)
   return kSuccess;
 }
 
-enum Error InitializeInterruptRegisterSetArray(struct Controller *xhc,
-                                               volatile struct InterrupterRegisterSetArrayWrapper 
-                                               *primary_interrupter)
+struct InterrupterRegisterSetArrayWrapper 
+InitializeInterruptRegisterSetArray(struct Controller *xhc)
 {
-  primary_interrupter->array = (struct InterrupterRegisterSet*)
+  struct InterrupterRegisterSetArrayWrapper primary_interrupter;
+  primary_interrupter.array = (struct InterrupterRegisterSet*)
     (xhc->mmio_base + (xhc->cap->RTSOFF.bits.runtime_register_space_offset << 5) + 0x20);
-  primary_interrupter->size = 1024;
-  return kSuccess;
+  primary_interrupter.size = 1024;
+  return primary_interrupter;
 }
+
+struct PortRegisterSetArrayWrapper
+InitializePortRegisterSetArray(struct Controller *xhc)
+{
+  struct PortRegisterSetArrayWrapper port_reg;
+  port_reg.array = (struct PortRegisterSet*)((uintptr_t)xhc->op + 0x400u);
+  port_reg.size = xhc->max_ports;
+  return port_reg;
+}
+
+struct DoorbellRegisterSetArrayWrapper
+InitializeDoorbellRegisterSetArray(struct Controller *xhc)
+{}
 
 uint8_t ReadCAPLENGTH(volatile struct CapabilityRegisters *cap)
 {

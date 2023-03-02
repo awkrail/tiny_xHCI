@@ -30,6 +30,7 @@ union EnableSlotCommandTRB InitializeEnableSlotCommandTRB()
   for(int i=0; i<4; ++i) {
     cmd.data[i] = 0x00000000;
   }
+  cmd.bits.trb_type = kEnableSlotCommandTRBType;
   return cmd;
 }
 

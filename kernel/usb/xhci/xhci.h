@@ -51,9 +51,14 @@ enum Error EnableInterruptForPrimaryInterrupter(struct InterrupterRegisterSet
                                                 *primary_interrupter);
 
 // Initialize Register Set Array
-enum Error InitializeInterruptRegisterSetArray(struct Controller *xhc,
-                                               volatile struct InterrupterRegisterSetArrayWrapper
-                                               *primary_interrupter);
+struct InterrupterRegisterSetArrayWrapper 
+InitializeInterruptRegisterSetArray(struct Controller *xhc);
+struct PortRegisterSetArrayWrapper
+InitializePortRegisterSetArray(struct Controller *xhc);
+struct DoorbellRegisterSetArrayWrapper
+InitializeDoorbellRegisterSetArray(struct Controller *xhc);
+
+
 
 /**
  * Initiealize Port and detect devices

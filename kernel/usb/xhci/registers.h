@@ -377,3 +377,9 @@ struct PortRegisterSetArrayWrapper
   struct PortRegisterSet *array;
   size_t size;
 };
+
+struct DoorbellRegisterSetArrayWrapper
+{
+  struct DoorbellRegister *array;
+  size_t size;
+};
